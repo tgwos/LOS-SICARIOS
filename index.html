@@ -2,19 +2,21 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#000000" />
   <title>LOS SICARIOS</title>
 
-  <!-- Telegram WebApp: non blocca il sito se non viene caricato -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
     :root {
       --white: #ffffff;
       --black: #000000;
-      --gray: #9b9b9b;
-      --glass: rgba(255,255,255,.06);
-      --border: rgba(255,255,255,.14);
+      --muted: rgba(255,255,255,.62);
+      --soft: rgba(255,255,255,.08);
+      --soft-2: rgba(255,255,255,.13);
+      --line: rgba(255,255,255,.18);
+      --shadow: rgba(0,0,0,.72);
     }
 
     * {
@@ -22,35 +24,60 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    html, body {
+    html,
+    body {
       margin: 0;
       min-height: 100%;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-      color: var(--white);
       background: #000;
+      color: var(--white);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Arial, sans-serif;
       overflow-x: hidden;
     }
 
     body {
-      padding-bottom: 110px;
+      min-height: 100vh;
+      padding-bottom: calc(96px + env(safe-area-inset-bottom));
     }
 
     .app-bg {
       position: fixed;
       inset: 0;
-      z-index: -1;
+      z-index: -3;
+      background: url("logosfondo.jpg") center / cover no-repeat;
+      transform: scale(1.03);
+    }
+
+    .app-bg::before {
+      content: "";
+      position: absolute;
+      inset: 0;
       background:
-        linear-gradient(rgba(0,0,0,.78), rgba(0,0,0,.96)),
-        url("logosfondo.jpg") center / cover no-repeat;
+        radial-gradient(circle at 50% 4%, rgba(255,255,255,.22), transparent 23%),
+        radial-gradient(circle at 15% 25%, rgba(255,255,255,.10), transparent 24%),
+        radial-gradient(circle at 85% 72%, rgba(255,255,255,.10), transparent 24%),
+        linear-gradient(to bottom, rgba(0,0,0,.46), rgba(0,0,0,.78) 45%, rgba(0,0,0,.96));
     }
 
     .app-bg::after {
       content: "";
       position: absolute;
       inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+      background-size: 38px 38px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,.85), transparent 72%);
+    }
+
+    .noise {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      pointer-events: none;
+      opacity: .13;
       background:
-        radial-gradient(circle at top, rgba(255,255,255,.08), transparent 35%),
-        linear-gradient(to bottom, transparent, rgba(0,0,0,.85));
+        repeating-radial-gradient(circle at 20% 30%, rgba(255,255,255,.22) 0 1px, transparent 1px 5px);
+      mix-blend-mode: screen;
     }
 
     #loader {
@@ -60,193 +87,383 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      background: #000;
+      transition: opacity .45s ease, visibility .45s ease;
+    }
+
+    #loader::before {
+      content: "";
+      position: absolute;
+      inset: 0;
       background:
-        linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.9)),
+        linear-gradient(rgba(0,0,0,.35), rgba(0,0,0,.92)),
         url("logosfondo.jpg") center / cover no-repeat;
-      transition: opacity .4s ease;
+      filter: contrast(1.1);
     }
 
     #loader::after {
       content: "";
       position: absolute;
-      inset: 0;
-      background: radial-gradient(circle, rgba(255,255,255,.08), rgba(0,0,0,.9));
+      width: 230px;
+      height: 230px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.2);
+      box-shadow: 0 0 80px rgba(255,255,255,.18), inset 0 0 55px rgba(255,255,255,.07);
+      animation: pulseRing 1.7s ease-in-out infinite;
     }
 
-    #loader-content {
+    .loader-card {
       position: relative;
       z-index: 2;
       text-align: center;
-      animation: fadeZoom 1.2s ease forwards;
+      animation: intro .9s ease forwards;
     }
 
-    #loader-content img,
-    .logo-main {
-      width: 145px;
-      height: 145px;
+    .logo {
+      width: 132px;
+      height: 132px;
       object-fit: cover;
-      border-radius: 26px;
-      border: 1px solid rgba(255,255,255,.25);
-      box-shadow: 0 0 35px rgba(255,255,255,.18);
-      background: #111;
+      border-radius: 34px;
+      border: 1px solid rgba(255,255,255,.32);
+      background: rgba(255,255,255,.06);
+      box-shadow:
+        0 0 35px rgba(255,255,255,.18),
+        0 24px 60px rgba(0,0,0,.85),
+        inset 0 0 26px rgba(255,255,255,.08);
     }
 
-    #loader-text {
+    .loader-title {
       margin-top: 22px;
-      font-size: 23px;
-      font-weight: 900;
-      letter-spacing: 7px;
-      color: #fff;
-      text-shadow: 0 0 18px rgba(255,255,255,.45);
+      font-size: 22px;
+      font-weight: 950;
+      letter-spacing: 8px;
+      text-shadow: 0 0 26px rgba(255,255,255,.62);
     }
 
-    @keyframes fadeZoom {
-      from { opacity: 0; transform: scale(.9); }
-      to { opacity: 1; transform: scale(1); }
+    @keyframes pulseRing {
+      0%, 100% { transform: scale(.93); opacity: .7; }
+      50% { transform: scale(1.05); opacity: 1; }
     }
 
-    .container {
+    @keyframes intro {
+      from { opacity: 0; transform: scale(.9) translateY(16px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .shell {
       width: 100%;
-      max-width: 480px;
+      max-width: 520px;
       margin: 0 auto;
-      padding: 30px 16px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 26px;
-      align-items: center;
+      padding: 22px 16px 18px;
     }
 
-    .header {
+    .hero {
+      min-height: 42vh;
       display: flex;
       flex-direction: column;
+      justify-content: flex-end;
       align-items: center;
-      gap: 14px;
       text-align: center;
+      padding: 18px 0 24px;
+      position: relative;
     }
 
-    .header-title {
-      font-size: 17px;
+    .hero::before {
+      content: "";
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,.18), transparent 62%);
+      filter: blur(8px);
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: -1;
+    }
+
+    .logo-wrap {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .logo-wrap::before,
+    .logo-wrap::after {
+      content: "";
+      position: absolute;
+      inset: -13px;
+      border-radius: 42px;
+      border: 1px solid rgba(255,255,255,.22);
+      transform: rotate(7deg);
+      pointer-events: none;
+    }
+
+    .logo-wrap::after {
+      inset: -22px;
+      opacity: .38;
+      transform: rotate(-8deg);
+    }
+
+    .hero .logo {
+      width: 154px;
+      height: 154px;
+      border-radius: 38px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 999px;
+      background: rgba(0,0,0,.42);
+      backdrop-filter: blur(14px);
+      color: rgba(255,255,255,.76);
+      font-size: 10px;
       font-weight: 900;
-      letter-spacing: 5px;
-      text-shadow: 0 0 12px rgba(255,255,255,.35);
+      letter-spacing: 2.4px;
+      text-transform: uppercase;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 15px rgba(255,255,255,.9);
+    }
+
+    h1 {
+      margin: 16px 0 6px;
+      font-size: clamp(34px, 11vw, 55px);
+      line-height: .9;
+      font-weight: 1000;
+      letter-spacing: -2px;
+      text-transform: uppercase;
+      text-shadow:
+        0 0 22px rgba(255,255,255,.35),
+        0 16px 34px rgba(0,0,0,.9);
     }
 
     .subtitle {
-      font-size: 11px;
-      letter-spacing: 3px;
-      color: var(--gray);
-      font-weight: 700;
+      max-width: 310px;
+      margin: 0 auto;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+      font-weight: 750;
+      letter-spacing: 2px;
+      text-transform: uppercase;
     }
 
     .panel {
-      width: 100%;
-      background: rgba(5,5,5,.82);
-      border-radius: 30px;
-      padding: 24px;
-      border: 1px solid var(--border);
-      backdrop-filter: blur(14px);
-      box-shadow:
-        0 20px 60px rgba(0,0,0,.65),
-        inset 0 0 25px rgba(255,255,255,.03);
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 18px;
-    }
-
-    .card-catalog {
-      grid-column: 1 / -1;
-      height: 185px;
-      border-radius: 26px;
-      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      border-radius: 34px;
+      padding: 18px;
       background:
-        linear-gradient(rgba(0,0,0,.35), rgba(0,0,0,.82)),
-        url("logosfondo.jpg") center / cover no-repeat;
-      border: 1px solid rgba(255,255,255,.16);
+        linear-gradient(145deg, rgba(255,255,255,.14), rgba(255,255,255,.045)),
+        rgba(0,0,0,.62);
+      border: 1px solid rgba(255,255,255,.18);
       box-shadow:
-        0 0 30px rgba(255,255,255,.08),
-        inset 0 0 40px rgba(0,0,0,.75);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform .2s ease;
+        0 26px 70px rgba(0,0,0,.82),
+        inset 0 1px 0 rgba(255,255,255,.22);
+      backdrop-filter: blur(18px);
     }
 
-    .card-catalog:active,
-    .small-wrapper:active,
-    .bottom-bar a:active,
-    .popup-link:active {
-      transform: scale(.97);
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      background: linear-gradient(115deg, transparent, rgba(255,255,255,.23), transparent 42%);
+      transform: translateX(-100%);
+      animation: shine 4.5s ease-in-out infinite;
+      pointer-events: none;
     }
 
-    .card-catalog span {
-      font-size: 27px;
-      font-weight: 900;
-      letter-spacing: 8px;
-      color: #fff;
-      text-shadow: 0 0 18px rgba(255,255,255,.45);
+    @keyframes shine {
+      0%, 28% { transform: translateX(-110%); }
+      55%, 100% { transform: translateX(110%); }
     }
 
-    .small-wrapper {
+    .main-action {
+      position: relative;
+      min-height: 172px;
+      border-radius: 28px;
+      padding: 20px;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-      transition: transform .2s ease;
-    }
-
-    .card-small {
-      width: 100%;
-      height: 122px;
-      border-radius: 24px;
-      background: var(--glass);
-      border: 1px solid rgba(255,255,255,.12);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow:
-        inset 0 0 18px rgba(255,255,255,.04),
-        0 12px 24px rgba(0,0,0,.45);
+      justify-content: flex-end;
       overflow: hidden;
+      cursor: pointer;
+      background:
+        linear-gradient(to bottom, rgba(255,255,255,.03), rgba(0,0,0,.74)),
+        url("logosfondo.jpg") center / cover no-repeat;
+      border: 1px solid rgba(255,255,255,.2);
+      box-shadow:
+        inset 0 0 45px rgba(255,255,255,.06),
+        0 18px 40px rgba(0,0,0,.58);
+      transition: transform .18s ease, border-color .18s ease;
     }
 
-    .card-small img {
-      width: 88%;
-      height: 88%;
-      object-fit: cover;
-      border-radius: 18px;
-      filter: grayscale(1) contrast(1.15);
-      background: #111;
+    .main-action::after {
+      content: "";
+      position: absolute;
+      right: -28px;
+      top: -32px;
+      width: 128px;
+      height: 128px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.24);
+      box-shadow: inset 0 0 30px rgba(255,255,255,.06);
     }
 
-    .small-label {
-      padding: 7px 14px;
-      border-radius: 999px;
+    .main-action:active,
+    .menu-card:active,
+    .dock a:active,
+    .popup-link:active {
+      transform: scale(.975);
+    }
+
+    .main-action small,
+    .menu-card small {
+      color: rgba(255,255,255,.63);
       font-size: 10px;
       font-weight: 900;
       letter-spacing: 2px;
-      background: #fff;
-      color: #000;
-      box-shadow: 0 0 16px rgba(255,255,255,.16);
+      text-transform: uppercase;
+    }
+
+    .main-action strong {
+      margin-top: 8px;
+      display: block;
+      font-size: 34px;
+      line-height: .92;
+      font-weight: 1000;
+      letter-spacing: -1px;
+      text-transform: uppercase;
+    }
+
+    .arrow {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 42px;
+      height: 42px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.18);
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .menu-grid {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .menu-card {
+      min-height: 126px;
+      border-radius: 25px;
+      padding: 15px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+      background:
+        radial-gradient(circle at top right, rgba(255,255,255,.18), transparent 38%),
+        linear-gradient(150deg, rgba(255,255,255,.115), rgba(255,255,255,.035));
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: inset 0 0 28px rgba(255,255,255,.035), 0 12px 28px rgba(0,0,0,.42);
+      transition: transform .18s ease, background .18s ease;
+    }
+
+    .menu-card::before {
+      content: "";
+      position: absolute;
+      width: 78px;
+      height: 78px;
+      right: -24px;
+      bottom: -24px;
+      border-radius: 28px;
+      background: rgba(255,255,255,.08);
+      transform: rotate(20deg);
+    }
+
+    .icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 17px;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.16);
+      box-shadow: inset 0 0 18px rgba(255,255,255,.045);
+      font-size: 22px;
+    }
+
+    .menu-card strong {
+      position: relative;
+      z-index: 1;
+      font-size: 15px;
+      line-height: 1.05;
+      font-weight: 950;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+    }
+
+    .status-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin: 14px 0 0;
+    }
+
+    .status-pill {
+      min-height: 58px;
+      border-radius: 20px;
+      padding: 10px;
+      background: rgba(0,0,0,.34);
+      border: 1px solid rgba(255,255,255,.1);
       text-align: center;
+    }
+
+    .status-pill b {
+      display: block;
+      font-size: 13px;
+      letter-spacing: .8px;
+    }
+
+    .status-pill span {
+      display: block;
+      margin-top: 4px;
+      color: rgba(255,255,255,.55);
+      font-size: 8px;
+      font-weight: 900;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
     }
 
     .popup-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,.78);
+      z-index: 999;
       display: flex;
-      align-items: center;
+      align-items: flex-end;
       justify-content: center;
+      padding: 16px 16px calc(18px + env(safe-area-inset-bottom));
+      background: rgba(0,0,0,.72);
+      backdrop-filter: blur(13px);
       opacity: 0;
       pointer-events: none;
-      transition: opacity .25s ease;
-      backdrop-filter: blur(8px);
-      z-index: 999;
-      padding: 20px;
+      transition: opacity .22s ease;
     }
 
     .popup-overlay.show {
@@ -256,167 +473,201 @@
 
     .popup-box {
       width: 100%;
-      max-width: 330px;
-      padding: 24px;
-      border-radius: 24px;
-      background: rgba(8,8,8,.96);
-      border: 1px solid rgba(255,255,255,.16);
-      box-shadow: 0 0 40px rgba(255,255,255,.12);
-      text-align: center;
+      max-width: 480px;
+      border-radius: 30px;
+      padding: 20px;
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.13), rgba(255,255,255,.04)),
+        rgba(4,4,4,.94);
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: 0 24px 80px rgba(0,0,0,.88), inset 0 1px 0 rgba(255,255,255,.18);
+      transform: translateY(22px) scale(.98);
+      transition: transform .22s ease;
+    }
+
+    .popup-overlay.show .popup-box {
+      transform: translateY(0) scale(1);
+    }
+
+    .popup-handle {
+      width: 46px;
+      height: 5px;
+      border-radius: 999px;
+      margin: 0 auto 18px;
+      background: rgba(255,255,255,.25);
     }
 
     .popup-title {
-      font-size: 15px;
-      font-weight: 900;
-      letter-spacing: 4px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
+      font-size: 24px;
+      line-height: 1;
+      font-weight: 1000;
+      letter-spacing: -1px;
+      text-transform: uppercase;
+      text-align: center;
     }
 
     .popup-link {
-      display: block;
-      padding: 13px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 58px;
+      padding: 16px;
       margin-top: 10px;
-      font-size: 14px;
-      font-weight: 800;
-      letter-spacing: 1px;
       color: #fff;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.1);
-      border-radius: 14px;
       text-decoration: none;
+      border-radius: 20px;
+      background: rgba(255,255,255,.09);
+      border: 1px solid rgba(255,255,255,.13);
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: .5px;
     }
 
-    .bottom-bar {
+    .popup-link::after {
+      content: "↗";
+      opacity: .75;
+      font-size: 18px;
+    }
+
+    .dock {
       position: fixed;
-      bottom: 14px;
       left: 14px;
       right: 14px;
-      max-width: 452px;
+      bottom: calc(12px + env(safe-area-inset-bottom));
+      z-index: 50;
+      max-width: 492px;
       margin: 0 auto;
-      height: 68px;
-      background: rgba(5,5,5,.9);
-      border-radius: 26px;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      border: 1px solid rgba(255,255,255,.14);
-      backdrop-filter: blur(14px);
-      box-shadow: 0 0 35px rgba(0,0,0,.8);
-      z-index: 20;
+      height: 72px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      padding: 10px;
+      border-radius: 28px;
+      background: rgba(3,3,3,.72);
+      border: 1px solid rgba(255,255,255,.16);
+      box-shadow: 0 18px 55px rgba(0,0,0,.86), inset 0 1px 0 rgba(255,255,255,.12);
+      backdrop-filter: blur(18px);
     }
 
-    .bottom-bar a {
-      width: 46px;
-      height: 46px;
+    .dock a {
+      border: 0;
+      border-radius: 20px;
+      background: rgba(255,255,255,.08);
+      color: #fff;
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 16px;
-      background: rgba(255,255,255,.05);
+      gap: 8px;
+      text-decoration: none;
+      font-size: 11px;
+      font-weight: 950;
+      letter-spacing: .8px;
+      text-transform: uppercase;
       cursor: pointer;
-      transition: transform .2s ease;
+      transition: transform .18s ease;
     }
 
-    .bottom-bar svg {
-      width: 23px;
-      height: 23px;
-      fill: #fff;
-      stroke: #fff;
+    .dock span {
+      font-size: 18px;
+      line-height: 1;
     }
 
-    @media (max-width: 360px) {
-      .panel { padding: 20px; }
-      .card-catalog span {
-        font-size: 23px;
-        letter-spacing: 6px;
-      }
-      .grid { gap: 14px; }
+    @media (max-width: 370px) {
+      .hero { min-height: 40vh; }
+      .hero .logo { width: 136px; height: 136px; }
+      .menu-card { min-height: 116px; }
+      .main-action strong { font-size: 30px; }
+      .dock a { font-size: 10px; }
     }
   </style>
 </head>
 
 <body>
   <div id="loader">
-    <div id="loader-content">
-      <img src="logopricipale.jpg" alt="Logo" onerror="this.src='logosfondo.jpg'" />
-      <div id="loader-text">LOS SICARIOS</div>
+    <div class="loader-card">
+      <img class="logo" src="logopricipale.jpg" alt="LOS SICARIOS" />
+      <div class="loader-title">LOS SICARIOS</div>
     </div>
   </div>
 
   <div class="app-bg"></div>
+  <div class="noise"></div>
 
-  <main class="container">
-    <header class="header">
-      <img class="logo-main" src="logopricipale.jpg" alt="Logo principale" onerror="this.src='logosfondo.jpg'" />
-      <div class="header-title">LOS SICARIOS</div>
-      <div class="subtitle">PRIVATE CATALOG</div>
-    </header>
+  <main class="shell">
+    <section class="hero">
+      <div class="logo-wrap">
+        <img class="logo" src="logopricipale.jpg" alt="LOS SICARIOS" />
+      </div>
+
+      <div class="eyebrow"><span class="dot"></span> Private Mobile Catalog</div>
+      <h1>LOS<br>SICARIOS</h1>
+      <p class="subtitle">Accesso rapido ai canali, contatti e catalogo ufficiale</p>
+    </section>
 
     <section class="panel">
-      <div class="grid">
-        <div class="card-catalog" data-page="catalog.html">
-          <span>CATALOGO</span>
+      <div class="main-action" data-page="catalog.html">
+        <div class="arrow">→</div>
+        <small>Enter the vault</small>
+        <strong>Catalogo</strong>
+      </div>
+
+      <div class="menu-grid">
+        <div class="menu-card" data-popup="contacts">
+          <div class="icon">✉️</div>
+          <div>
+            <small>Direct</small>
+            <strong>Contacts</strong>
+          </div>
         </div>
 
-        <div class="small-wrapper" data-popup="contacts">
-          <div class="card-small">
-            <img src="logopricipale.jpg" alt="Contacts" onerror="this.src='logosfondo.jpg'" />
+        <div class="menu-card" data-popup="channels">
+          <div class="icon">📡</div>
+          <div>
+            <small>Official</small>
+            <strong>Channels</strong>
           </div>
-          <div class="small-label">CONTACTS</div>
         </div>
 
-        <div class="small-wrapper" data-popup="channels">
-          <div class="card-small">
-            <img src="logopricipale.jpg" alt="Channels" onerror="this.src='logosfondo.jpg'" />
+        <div class="menu-card" data-page="recensioni.html">
+          <div class="icon">★</div>
+          <div>
+            <small>Feedback</small>
+            <strong>Recensioni</strong>
           </div>
-          <div class="small-label">CHANNELS</div>
         </div>
 
-        <div class="small-wrapper" data-popup="created">
-          <div class="card-small">
-            <img src="logopricipale.jpg" alt="Created by" onerror="this.src='logosfondo.jpg'" />
+        <div class="menu-card" data-popup="created">
+          <div class="icon">⚡</div>
+          <div>
+            <small>Design</small>
+            <strong>Created By</strong>
           </div>
-          <div class="small-label">CREATED BY</div>
         </div>
+      </div>
 
-        <div class="small-wrapper" data-page="recensioni.html">
-          <div class="card-small">
-            <img src="logopricipale.jpg" alt="Recensioni" onerror="this.src='logosfondo.jpg'" />
-          </div>
-          <div class="small-label">RECENSIONI</div>
-        </div>
+      <div class="status-row">
+        <div class="status-pill"><b>24/7</b><span>Online</span></div>
+        <div class="status-pill"><b>TG</b><span>Ready</span></div>
+        <div class="status-pill"><b>VIP</b><span>Access</span></div>
       </div>
     </section>
   </main>
 
   <div id="popup" class="popup-overlay" aria-hidden="true">
     <div class="popup-box" role="dialog" aria-modal="true">
+      <div class="popup-handle"></div>
       <div class="popup-title" id="popup-title"></div>
       <a class="popup-link" id="popup-link-1" href="#" target="_blank" rel="noopener"></a>
       <a class="popup-link" id="popup-link-2" href="#" target="_blank" rel="noopener" style="display:none;"></a>
     </div>
   </div>
 
-  <nav class="bottom-bar" aria-label="Social links">
-    <a data-url="https://t.me/Italianfarm11" aria-label="Telegram">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M22.5 3.5L2.8 10.9c-.9.3-.9 1.6.1 1.9l4.9 1.6 1.9 5.9c.3.9 1.5 1 2 .2l2.8-4.1 5.6 4.1c.8.6 2 .1 2.2-.9l3.4-15.3c.2-.9-.7-1.6-1.7-1.4z" />
-      </svg>
-    </a>
-
-    <a data-url="https://instagram.com/" aria-label="Instagram">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <rect x="3" y="3" width="18" height="18" rx="5" ry="5" fill="none" stroke-width="2" />
-        <circle cx="12" cy="12" r="4" fill="none" stroke-width="2" />
-        <circle cx="17.5" cy="6.5" r="1.2" />
-      </svg>
-    </a>
-
-    <a data-url="https://signal.me/#eu/kRf_X-QX9q6AnKI0IC9lsi2GjAiS7cLKf_MoHkGnHt1U3msPbTJOYJ7C2IOfVkU5" aria-label="Signal">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M12 2a10 10 0 1 0 0 20" />
-      </svg>
-    </a>
+  <nav class="dock" aria-label="Link rapidi">
+    <a data-url="https://t.me/Italianfarm11"><span>✈️</span> Telegram</a>
+    <a data-url="https://instagram.com/"><span>◎</span> Insta</a>
+    <a data-url="https://signal.me/#eu/kRf_X-QX9q6AnKI0IC9lsi2GjAiS7cLKf_MoHkGnHt1U3msPbTJOYJ7C2IOfVkU5"><span>◌</span> Signal</a>
   </nav>
 
   <script>
@@ -425,25 +676,27 @@
     if (tg) {
       tg.ready();
       tg.expand();
+      tg.setHeaderColor && tg.setHeaderColor("#000000");
+      tg.setBackgroundColor && tg.setBackgroundColor("#000000");
     }
 
     const links = {
       contacts: {
-        title: "CONTACT",
+        title: "Contact",
         firstText: "📨 Telegram",
         firstUrl: "https://t.me/Italianfarm11",
         secondText: "📞 Signal",
         secondUrl: "https://signal.me/#eu/kRf_X-QX9q6AnKI0IC9lsi2GjAiS7cLKf_MoHkGnHt1U3msPbTJOYJ7C2IOfVkU5"
       },
       channels: {
-        title: "CHANNEL",
+        title: "Channel",
         firstText: "📢 Telegram Channel",
         firstUrl: "https://t.me/+TJZTE4SGZBRhNTE0",
         secondText: "📞 Signal Group",
         secondUrl: "https://signal.group/#CjQKIDNGRGl9UmFJzST3ADxn0PsPIc0zsRWW1foOy3Ity-KvEhBjRjUNbHUuV1qczApKp_ok"
       },
       created: {
-        title: "CREATED BY",
+        title: "Created By",
         firstText: "👨‍💻 BOX CREATE",
         firstUrl: "https://t.me/boxcreate22"
       }
@@ -454,8 +707,16 @@
     const popupLink1 = document.getElementById("popup-link-1");
     const popupLink2 = document.getElementById("popup-link-2");
 
+    function haptic(type) {
+      if (tg && tg.HapticFeedback) {
+        if (type === "impact") tg.HapticFeedback.impactOccurred("medium");
+        if (type === "success") tg.HapticFeedback.notificationOccurred("success");
+      }
+    }
+
     function openExternal(url) {
       if (!url) return;
+      haptic("impact");
 
       if (tg && typeof tg.openLink === "function") {
         tg.openLink(url);
@@ -467,9 +728,9 @@
     function openPopup(type) {
       const data = links[type];
       if (!data) return;
+      haptic("success");
 
       popupTitle.textContent = data.title;
-
       popupLink1.textContent = data.firstText;
       popupLink1.href = data.firstUrl;
       popupLink1.onclick = function(event) {
@@ -480,7 +741,7 @@
       if (data.secondText && data.secondUrl) {
         popupLink2.textContent = data.secondText;
         popupLink2.href = data.secondUrl;
-        popupLink2.style.display = "block";
+        popupLink2.style.display = "flex";
         popupLink2.onclick = function(event) {
           event.preventDefault();
           openExternal(data.secondUrl);
@@ -504,15 +765,14 @@
       setTimeout(function() {
         const loader = document.getElementById("loader");
         loader.style.opacity = "0";
-        setTimeout(function() {
-          loader.style.display = "none";
-        }, 400);
-      }, 1200);
+        loader.style.visibility = "hidden";
+      }, 950);
     });
 
     document.addEventListener("click", function(event) {
       const pageButton = event.target.closest("[data-page]");
       if (pageButton) {
+        haptic("impact");
         window.location.href = pageButton.dataset.page;
         return;
       }
@@ -535,9 +795,7 @@
     });
 
     document.addEventListener("keydown", function(event) {
-      if (event.key === "Escape") {
-        closePopup();
-      }
+      if (event.key === "Escape") closePopup();
     });
   </script>
 </body>
