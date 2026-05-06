@@ -1,1 +1,742 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#000000" />
+  <title>Catalogo Canapa Light</title>
 
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: #000;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Arial, sans-serif;
+      overflow-x: hidden;
+    }
+
+    body {
+      min-height: 100vh;
+      padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+    }
+
+    .bg {
+      position: fixed;
+      inset: 0;
+      z-index: -5;
+      background: url("logosfondo.jpg") center / cover no-repeat;
+      transform: scale(1.08);
+      filter: contrast(1.05) brightness(.78);
+    }
+
+    .bg::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,.18), transparent 24%),
+        radial-gradient(circle at 92% 22%, rgba(255,255,255,.09), transparent 25%),
+        linear-gradient(to bottom, rgba(0,0,0,.42), rgba(0,0,0,.84) 45%, rgba(0,0,0,.99));
+    }
+
+    .glow {
+      position: fixed;
+      border-radius: 999px;
+      pointer-events: none;
+      filter: blur(70px);
+      opacity: .28;
+      z-index: -4;
+      animation: float 9s ease-in-out infinite;
+    }
+
+    .glow.one {
+      width: 220px;
+      height: 220px;
+      top: -70px;
+      right: -70px;
+      background: rgba(255,255,255,.18);
+    }
+
+    .glow.two {
+      width: 180px;
+      height: 180px;
+      bottom: 80px;
+      left: -60px;
+      background: rgba(255,255,255,.10);
+      animation-delay: 2s;
+    }
+
+    @keyframes float {
+      0%,100% { transform: translate3d(0,0,0) scale(1); }
+      50% { transform: translate3d(12px,18px,0) scale(1.07); }
+    }
+
+    .app {
+      width: 100%;
+      max-width: 520px;
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 16px 14px calc(22px + env(safe-area-inset-bottom));
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      padding: 10px 0 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      backdrop-filter: blur(18px);
+    }
+
+    .back-btn {
+      width: 46px;
+      height: 46px;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 17px;
+      color: #fff;
+      background: rgba(255,255,255,.08);
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+      cursor: pointer;
+      box-shadow: inset 0 0 18px rgba(255,255,255,.04), 0 14px 30px rgba(0,0,0,.45);
+    }
+
+    .title-chip {
+      flex: 1;
+      min-height: 46px;
+      padding: 8px 12px;
+      border-radius: 18px;
+      background: rgba(0,0,0,.42);
+      border: 1px solid rgba(255,255,255,.14);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 14px 30px rgba(0,0,0,.36);
+    }
+
+    .title-chip img {
+      width: 31px;
+      height: 31px;
+      border-radius: 11px;
+      object-fit: cover;
+    }
+
+    .title-chip span {
+      font-size: 12px;
+      font-weight: 1000;
+      letter-spacing: 1.7px;
+      text-transform: uppercase;
+    }
+
+    .hero {
+      padding: 18px 2px 18px;
+    }
+
+    .eyebrow {
+      color: rgba(255,255,255,.58);
+      font-size: 10px;
+      font-weight: 1000;
+      letter-spacing: 2.2px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 9px 0 0;
+      font-size: clamp(40px, 12vw, 60px);
+      line-height: .9;
+      letter-spacing: -2.4px;
+      font-weight: 1000;
+      text-transform: uppercase;
+      text-shadow: 0 0 22px rgba(255,255,255,.26), 0 18px 42px rgba(0,0,0,.88);
+    }
+
+    .subtitle {
+      margin-top: 10px;
+      max-width: 340px;
+      color: rgba(255,255,255,.58);
+      font-size: 12px;
+      line-height: 1.45;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    .search-box {
+      margin-top: 16px;
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      height: 52px;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 20px;
+      padding: 0 16px 0 44px;
+      outline: 0;
+      color: #fff;
+      background: rgba(255,255,255,.08);
+      backdrop-filter: blur(18px);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 800;
+      box-shadow: inset 0 0 20px rgba(255,255,255,.035), 0 16px 35px rgba(0,0,0,.42);
+    }
+
+    .search-box input::placeholder {
+      color: rgba(255,255,255,.42);
+    }
+
+    .search-box::before {
+      content: "⌕";
+      position: absolute;
+      left: 17px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255,255,255,.55);
+      font-size: 22px;
+      z-index: 1;
+    }
+
+    .catalog-shell {
+      margin-top: 16px;
+      padding: 13px;
+      border-radius: 34px;
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.13), rgba(255,255,255,.035)),
+        rgba(0,0,0,.58);
+      border: 1px solid rgba(255,255,255,.17);
+      backdrop-filter: blur(22px);
+      box-shadow: 0 28px 80px rgba(0,0,0,.82), inset 0 1px 0 rgba(255,255,255,.18);
+    }
+
+    .products {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .product {
+      position: relative;
+      min-height: 210px;
+      border: 0;
+      border-radius: 27px;
+      overflow: hidden;
+      color: #fff;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.13);
+      cursor: pointer;
+      text-align: left;
+      box-shadow: inset 0 0 24px rgba(255,255,255,.04), 0 16px 34px rgba(0,0,0,.48);
+      isolation: isolate;
+      transition: transform .18s ease;
+    }
+
+    .product:active {
+      transform: scale(.975);
+    }
+
+    .product img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -2;
+      filter: contrast(1.04) brightness(.8);
+    }
+
+    .product::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: linear-gradient(to bottom, rgba(0,0,0,.08), rgba(0,0,0,.78));
+    }
+
+    .product-info {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+    }
+
+    .product-tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 0 9px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.13);
+      border: 1px solid rgba(255,255,255,.15);
+      color: rgba(255,255,255,.72);
+      font-size: 9px;
+      font-weight: 1000;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      backdrop-filter: blur(12px);
+    }
+
+    .product-name {
+      margin-top: 8px;
+      font-size: 15px;
+      line-height: 1.05;
+      font-weight: 1000;
+      text-transform: uppercase;
+      text-shadow: 0 8px 20px rgba(0,0,0,.7);
+    }
+
+    .empty {
+      display: none;
+      padding: 28px 16px;
+      text-align: center;
+      color: rgba(255,255,255,.56);
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.45;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      background: rgba(0,0,0,.88);
+      backdrop-filter: blur(18px);
+      padding: calc(14px + env(safe-area-inset-top)) 14px calc(18px + env(safe-area-inset-bottom));
+    }
+
+    .modal.show {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .modal-title {
+      flex: 1;
+      min-height: 46px;
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      font-size: 13px;
+      font-weight: 1000;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .close-btn {
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 17px;
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.14);
+      color: #fff;
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    .media-wrap {
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      place-items: center;
+      border-radius: 30px;
+      overflow: hidden;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.13);
+      box-shadow: 0 24px 70px rgba(0,0,0,.7);
+    }
+
+    .media-wrap img,
+    .media-wrap video {
+      width: 100%;
+      height: 100%;
+      max-height: 64vh;
+      object-fit: contain;
+      background: #000;
+    }
+
+    .nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 48px;
+      height: 48px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 18px;
+      background: rgba(0,0,0,.45);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 30px;
+      font-weight: 900;
+      cursor: pointer;
+      backdrop-filter: blur(14px);
+    }
+
+    .nav-btn.left { left: 10px; }
+    .nav-btn.right { right: 10px; }
+
+    .details {
+      margin-top: 12px;
+      padding: 15px;
+      border-radius: 25px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+    }
+
+    .details h2 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1;
+      font-weight: 1000;
+      letter-spacing: -1px;
+      text-transform: uppercase;
+    }
+
+    .details p {
+      margin: 8px 0 0;
+      color: rgba(255,255,255,.58);
+      font-size: 12px;
+      line-height: 1.45;
+      font-weight: 800;
+    }
+
+    .prices {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .price-item {
+      min-height: 54px;
+      padding: 10px;
+      border-radius: 17px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      text-align: center;
+      font-size: 12px;
+      font-weight: 900;
+      color: rgba(255,255,255,.82);
+    }
+
+    .price-item strong {
+      display: block;
+      margin-top: 3px;
+      color: #fff;
+      font-size: 16px;
+    }
+
+    .contact-btn {
+      width: 100%;
+      min-height: 58px;
+      margin-top: 14px;
+      border: 0;
+      border-radius: 20px;
+      color: #000;
+      background: #fff;
+      font-size: 14px;
+      font-weight: 1000;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 16px 34px rgba(255,255,255,.12);
+    }
+
+    @media (max-width: 370px) {
+      .products { gap: 10px; }
+      .product { min-height: 185px; border-radius: 24px; }
+      .product-name { font-size: 13px; }
+      h1 { font-size: 38px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg"></div>
+  <div class="glow one"></div>
+  <div class="glow two"></div>
+
+  <main class="app">
+    <header class="topbar">
+      <button class="back-btn" id="backBtn" type="button" aria-label="Indietro">←</button>
+      <div class="title-chip">
+        <img src="logopricipale.jpg" alt="Logo" />
+        <span>Canapa Light</span>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="eyebrow">Prodotti legali</div>
+      <h1>Canapa<br>Light</h1>
+      <div class="subtitle">Catalogo mobile per prodotti di canapa light legale. Contenuti destinati a maggiorenni e nel rispetto delle normative locali.</div>
+
+      <div class="search-box">
+        <input id="searchInput" type="search" placeholder="Cerca varietà o prodotto" autocomplete="off" />
+      </div>
+    </section>
+
+    <section class="catalog-shell">
+      <div class="products" id="products"></div>
+      <div class="empty" id="emptyState">Nessun elemento trovato.</div>
+    </section>
+  </main>
+
+  <section class="modal" id="modal" aria-hidden="true">
+    <div class="modal-top">
+      <div class="modal-title" id="modalTitle">Dettaglio</div>
+      <button class="close-btn" id="closeBtn" type="button" aria-label="Chiudi">×</button>
+    </div>
+
+    <div class="media-wrap">
+      <div id="mediaContainer"></div>
+      <button class="nav-btn left" id="prevBtn" type="button" aria-label="Media precedente">‹</button>
+      <button class="nav-btn right" id="nextBtn" type="button" aria-label="Media successivo">›</button>
+    </div>
+
+    <div class="details">
+      <h2 id="detailName">Nome</h2>
+      <p>Visualizza immagini, video e dettagli del prodotto. I prezzi sono indicativi e riferiti esclusivamente a prodotti di canapa light legali.</p>
+      <div class="prices" id="prices"></div>
+      <button class="contact-btn" id="contactBtn" type="button">💬 Richiedi info</button>
+    </div>
+  </section>
+
+  <script>
+    const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+
+    if (tg) {
+      tg.ready();
+      tg.expand();
+      if (tg.setHeaderColor) tg.setHeaderColor("#000000");
+      if (tg.setBackgroundColor) tg.setBackgroundColor("#000000");
+    }
+
+    const CATEGORY = "stock1";
+
+    let products = [];
+    let visibleProducts = [];
+    let currentProduct = null;
+    let mediaIndex = 0;
+    let currentVideo = null;
+    const CONTACT = "rafacaroquintero93";
+
+    const productsBox = document.getElementById("products");
+    const emptyState = document.getElementById("emptyState");
+    const modal = document.getElementById("modal");
+    const mediaContainer = document.getElementById("mediaContainer");
+    const modalTitle = document.getElementById("modalTitle");
+    const detailName = document.getElementById("detailName");
+    const pricesBox = document.getElementById("prices");
+    const contactBtn = document.getElementById("contactBtn");
+    const searchInput = document.getElementById("searchInput");
+
+    fetch("products.json?v=" + Date.now())
+      .then(response => response.json())
+      .then(data => {
+        products = data.filter(item => item.category === CATEGORY);
+        visibleProducts = products;
+        renderProducts();
+      })
+      .catch(() => {
+        productsBox.innerHTML = "";
+        emptyState.style.display = "block";
+        emptyState.textContent = "Impossibile caricare products.json.";
+      });
+
+    function haptic(type) {
+      if (!tg || !tg.HapticFeedback) return;
+      if (type === "impact") tg.HapticFeedback.impactOccurred("medium");
+      if (type === "success") tg.HapticFeedback.notificationOccurred("success");
+    }
+
+    function renderProducts() {
+      productsBox.innerHTML = "";
+      emptyState.style.display = visibleProducts.length ? "none" : "block";
+
+      visibleProducts.forEach((item, index) => {
+        const button = document.createElement("button");
+        button.className = "product";
+        button.type = "button";
+        button.innerHTML = `
+          <img src="${item.previewImage || "logosfondo.jpg"}" alt="${escapeHtml(item.name || "Elemento")}" loading="lazy" />
+          <div class="product-info">
+            <div class="product-tag">CBD LIGHT</div>
+            <div class="product-name">${escapeHtml(item.name || "Elemento")}</div>
+          </div>
+        `;
+        button.addEventListener("click", () => openModal(item));
+        productsBox.appendChild(button);
+      });
+    }
+
+    function openModal(item) {
+      currentProduct = item;
+      mediaIndex = 0;
+      haptic("success");
+      modal.classList.add("show");
+      modal.setAttribute("aria-hidden", "false");
+      modalTitle.textContent = item.name || "Dettaglio";
+      detailName.textContent = item.name || "Dettaglio";
+      if (tg && tg.BackButton) tg.BackButton.show();
+      loadMedia();
+      loadPrices();
+    }
+
+    function closeModal() {
+      stopVideo();
+      modal.classList.remove("show");
+      modal.setAttribute("aria-hidden", "true");
+      mediaContainer.innerHTML = "";
+      if (tg && tg.BackButton) tg.BackButton.hide();
+    }
+
+    function stopVideo() {
+      if (!currentVideo) return;
+      currentVideo.pause();
+      currentVideo.currentTime = 0;
+      currentVideo = null;
+    }
+
+    function loadMedia() {
+      stopVideo();
+      mediaContainer.innerHTML = "";
+
+      const media = currentProduct && currentProduct.media ? currentProduct.media : [];
+      if (!media.length) {
+        const img = document.createElement("img");
+        img.src = currentProduct.previewImage || "logosfondo.jpg";
+        img.alt = currentProduct.name || "Anteprima";
+        mediaContainer.appendChild(img);
+        return;
+      }
+
+      const selected = media[mediaIndex];
+
+      if (selected.type === "video") {
+        const video = document.createElement("video");
+        video.src = selected.src;
+        video.controls = true;
+        video.playsInline = true;
+        video.preload = "metadata";
+        mediaContainer.appendChild(video);
+        currentVideo = video;
+        video.play().catch(() => {});
+      } else {
+        const img = document.createElement("img");
+        img.src = selected.src;
+        img.alt = currentProduct.name || "Media";
+        img.loading = "lazy";
+        mediaContainer.appendChild(img);
+      }
+    }
+
+    function loadPrices() {
+      pricesBox.innerHTML = "";
+      const prices = currentProduct && currentProduct.prices ? currentProduct.prices : [];
+
+      if (!prices.length) {
+        pricesBox.innerHTML = '<div class="price-item"><span>Prezzo</span><strong>Su richiesta</strong></div>';
+        return;
+      }
+
+      prices.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "price-item";
+        div.innerHTML = `<span>${escapeHtml(item.quantity)} g</span><strong>€${escapeHtml(item.price)}</strong>`;
+        pricesBox.appendChild(div);
+      });
+    }
+
+    function contactProduct() {
+      if (!currentProduct) return;
+      const text = encodeURIComponent("Ciao, vorrei informazioni sul prodotto di canapa light: " + (currentProduct.name || "prodotto"));
+      const url = "https://t.me/" + CONTACT + "?text=" + text;
+      if (tg && typeof tg.openLink === "function") {
+        tg.openLink(url);
+      } else {
+        window.open(url, "_blank", "noopener,noreferrer");
+      }
+    }
+
+    function changeMedia(direction) {
+      const media = currentProduct && currentProduct.media ? currentProduct.media : [];
+      if (!media.length) return;
+      haptic("impact");
+      mediaIndex = (mediaIndex + direction + media.length) % media.length;
+      loadMedia();
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    document.getElementById("backBtn").addEventListener("click", () => {
+      if (modal.classList.contains("show")) {
+        closeModal();
+      } else {
+        window.location.href = "index.html";
+      }
+    });
+
+    document.getElementById("closeBtn").addEventListener("click", closeModal);
+    document.getElementById("prevBtn").addEventListener("click", () => changeMedia(-1));
+    document.getElementById("nextBtn").addEventListener("click", () => changeMedia(1));
+    contactBtn.addEventListener("click", contactProduct);
+
+    searchInput.addEventListener("input", () => {
+      const query = searchInput.value.trim().toLowerCase();
+      visibleProducts = products.filter(item => String(item.name || "").toLowerCase().includes(query));
+      renderProducts();
+    });
+
+    if (tg && tg.BackButton) {
+      tg.BackButton.onClick(() => {
+        if (modal.classList.contains("show")) {
+          closeModal();
+        } else {
+          window.location.href = "index.html";
+        }
+      });
+    }
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") closeModal();
+      if (event.key === "ArrowLeft") changeMedia(-1);
+      if (event.key === "ArrowRight") changeMedia(1);
+    });
+  </script>
+</body>
+</html>
