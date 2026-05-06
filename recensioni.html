@@ -1,1 +1,84 @@
+<!DOCTYPE html>
 
+    function haptic(type) {
+      if (!tg || !tg.HapticFeedback) return;
+      if (type === "impact") tg.HapticFeedback.impactOccurred("medium");
+      if (type === "success") tg.HapticFeedback.notificationOccurred("success");
+    }
+
+    fetch("foto.json?v=" + Date.now())
+      .then(response => response.json())
+      .then(data => {
+        const items = Array.isArray(data) ? data : [];
+        reviewCount.textContent = items.length;
+        emptyState.style.display = items.length ? "none" : "block";
+
+        items.forEach((item, index) => {
+          const src = item.img || item.src || item.url;
+          if (!src) return;
+
+          const card = document.createElement("button");
+          card.className = "review-card";
+          card.type = "button";
+          card.innerHTML = `
+            <img src="${src}" alt="Recensione ${index + 1}" loading="lazy" />
+            <div class="review-info">
+              <div class="review-badge">Review #${String(index + 1).padStart(2, "0")}</div>
+              <div class="open-pill">↗</div>
+            </div>
+          `;
+          card.addEventListener("click", () => openViewer(src, index + 1));
+          gallery.appendChild(card);
+        });
+      })
+      .catch(() => {
+        emptyState.style.display = "block";
+        emptyState.textContent = "Impossibile caricare foto.json.";
+      });
+
+    function openViewer(src, index) {
+      haptic("success");
+      viewerImg.src = src;
+      viewerLabel.textContent = "Recensione #" + String(index).padStart(2, "0");
+      viewer.classList.add("show");
+      viewer.setAttribute("aria-hidden", "false");
+      if (tg && tg.BackButton) tg.BackButton.show();
+    }
+
+    function closeViewer() {
+      viewer.classList.remove("show");
+      viewer.setAttribute("aria-hidden", "true");
+      viewerImg.src = "";
+      if (tg && tg.BackButton) tg.BackButton.hide();
+    }
+
+    document.getElementById("closeViewer").addEventListener("click", closeViewer);
+
+    viewer.addEventListener("click", event => {
+      if (event.target === viewer) closeViewer();
+    });
+
+    document.getElementById("backBtn").addEventListener("click", () => {
+      if (viewer.classList.contains("show")) {
+        closeViewer();
+      } else {
+        window.location.href = "index.html";
+      }
+    });
+
+    if (tg && tg.BackButton) {
+      tg.BackButton.onClick(() => {
+        if (viewer.classList.contains("show")) {
+          closeViewer();
+        } else {
+          window.location.href = "index.html";
+        }
+      });
+    }
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") closeViewer();
+    });
+  </script>
+</body>
+</html>
