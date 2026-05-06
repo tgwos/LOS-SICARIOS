@@ -11,12 +11,10 @@
   <style>
     :root {
       --white: #ffffff;
-      --black: #000000;
-      --muted: rgba(255,255,255,.62);
-      --soft: rgba(255,255,255,.08);
-      --soft-2: rgba(255,255,255,.13);
-      --line: rgba(255,255,255,.18);
-      --shadow: rgba(0,0,0,.72);
+      --muted: rgba(255,255,255,.64);
+      --line: rgba(255,255,255,.16);
+      --glass: rgba(255,255,255,.08);
+      --glass-strong: rgba(255,255,255,.14);
     }
 
     * {
@@ -36,7 +34,7 @@
 
     body {
       min-height: 100vh;
-      padding-bottom: calc(96px + env(safe-area-inset-bottom));
+      padding-bottom: calc(18px + env(safe-area-inset-bottom));
     }
 
     .app-bg {
@@ -44,7 +42,7 @@
       inset: 0;
       z-index: -3;
       background: url("logosfondo.jpg") center / cover no-repeat;
-      transform: scale(1.03);
+      transform: scale(1.04);
     }
 
     .app-bg::before {
@@ -52,10 +50,9 @@
       position: absolute;
       inset: 0;
       background:
-        radial-gradient(circle at 50% 4%, rgba(255,255,255,.22), transparent 23%),
-        radial-gradient(circle at 15% 25%, rgba(255,255,255,.10), transparent 24%),
-        radial-gradient(circle at 85% 72%, rgba(255,255,255,.10), transparent 24%),
-        linear-gradient(to bottom, rgba(0,0,0,.46), rgba(0,0,0,.78) 45%, rgba(0,0,0,.96));
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,.25), transparent 24%),
+        radial-gradient(circle at 20% 34%, rgba(255,255,255,.12), transparent 22%),
+        linear-gradient(to bottom, rgba(0,0,0,.42), rgba(0,0,0,.83) 46%, rgba(0,0,0,.98));
     }
 
     .app-bg::after {
@@ -63,144 +60,109 @@
       position: absolute;
       inset: 0;
       background-image:
-        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
-      background-size: 38px 38px;
-      mask-image: linear-gradient(to bottom, rgba(0,0,0,.85), transparent 72%);
-    }
-
-    .noise {
-      position: fixed;
-      inset: 0;
-      z-index: -2;
-      pointer-events: none;
-      opacity: .13;
-      background:
-        repeating-radial-gradient(circle at 20% 30%, rgba(255,255,255,.22) 0 1px, transparent 1px 5px);
-      mix-blend-mode: screen;
+        linear-gradient(rgba(255,255,255,.032) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.032) 1px, transparent 1px);
+      background-size: 36px 36px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,.85), transparent 70%);
     }
 
     #loader {
       position: fixed;
       inset: 0;
       z-index: 9999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #000;
-      transition: opacity .45s ease, visibility .45s ease;
-    }
-
-    #loader::before {
-      content: "";
-      position: absolute;
-      inset: 0;
+      display: grid;
+      place-items: center;
       background:
-        linear-gradient(rgba(0,0,0,.35), rgba(0,0,0,.92)),
+        linear-gradient(rgba(0,0,0,.35), rgba(0,0,0,.95)),
         url("logosfondo.jpg") center / cover no-repeat;
-      filter: contrast(1.1);
-    }
-
-    #loader::after {
-      content: "";
-      position: absolute;
-      width: 230px;
-      height: 230px;
-      border-radius: 50%;
-      border: 1px solid rgba(255,255,255,.2);
-      box-shadow: 0 0 80px rgba(255,255,255,.18), inset 0 0 55px rgba(255,255,255,.07);
-      animation: pulseRing 1.7s ease-in-out infinite;
+      transition: opacity .45s ease, visibility .45s ease;
     }
 
     .loader-card {
       position: relative;
-      z-index: 2;
       text-align: center;
-      animation: intro .9s ease forwards;
+      animation: enter .9s ease both;
+    }
+
+    .loader-card::before {
+      content: "";
+      position: absolute;
+      inset: -34px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.22);
+      box-shadow: 0 0 90px rgba(255,255,255,.16), inset 0 0 60px rgba(255,255,255,.08);
+      animation: pulse 1.8s ease-in-out infinite;
     }
 
     .logo {
-      width: 132px;
-      height: 132px;
+      position: relative;
+      width: 142px;
+      height: 142px;
       object-fit: cover;
-      border-radius: 34px;
-      border: 1px solid rgba(255,255,255,.32);
+      border-radius: 36px;
+      border: 1px solid rgba(255,255,255,.34);
       background: rgba(255,255,255,.06);
       box-shadow:
-        0 0 35px rgba(255,255,255,.18),
+        0 0 36px rgba(255,255,255,.18),
         0 24px 60px rgba(0,0,0,.85),
         inset 0 0 26px rgba(255,255,255,.08);
     }
 
     .loader-title {
+      position: relative;
       margin-top: 22px;
       font-size: 22px;
-      font-weight: 950;
+      font-weight: 1000;
       letter-spacing: 8px;
       text-shadow: 0 0 26px rgba(255,255,255,.62);
     }
 
-    @keyframes pulseRing {
-      0%, 100% { transform: scale(.93); opacity: .7; }
+    @keyframes pulse {
+      0%, 100% { transform: scale(.94); opacity: .7; }
       50% { transform: scale(1.05); opacity: 1; }
     }
 
-    @keyframes intro {
-      from { opacity: 0; transform: scale(.9) translateY(16px); }
-      to { opacity: 1; transform: scale(1) translateY(0); }
+    @keyframes enter {
+      from { opacity: 0; transform: translateY(18px) scale(.92); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    .shell {
+    .page {
       width: 100%;
       max-width: 520px;
+      min-height: 100vh;
       margin: 0 auto;
-      padding: 22px 16px 18px;
+      padding: 22px 16px calc(22px + env(safe-area-inset-bottom));
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 18px;
     }
 
     .hero {
-      min-height: 42vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      align-items: center;
       text-align: center;
-      padding: 18px 0 24px;
-      position: relative;
+      padding-top: 10px;
     }
 
-    .hero::before {
+    .logo-ring {
+      position: relative;
+      width: fit-content;
+      margin: 0 auto 20px;
+    }
+
+    .logo-ring::before,
+    .logo-ring::after {
       content: "";
       position: absolute;
-      width: 260px;
-      height: 260px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(255,255,255,.18), transparent 62%);
-      filter: blur(8px);
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: -1;
-    }
-
-    .logo-wrap {
-      position: relative;
-      margin-bottom: 20px;
-    }
-
-    .logo-wrap::before,
-    .logo-wrap::after {
-      content: "";
-      position: absolute;
-      inset: -13px;
-      border-radius: 42px;
+      inset: -14px;
+      border-radius: 45px;
       border: 1px solid rgba(255,255,255,.22);
-      transform: rotate(7deg);
-      pointer-events: none;
+      transform: rotate(8deg);
     }
 
-    .logo-wrap::after {
-      inset: -22px;
-      opacity: .38;
+    .logo-ring::after {
+      inset: -24px;
+      opacity: .35;
       transform: rotate(-8deg);
     }
 
@@ -210,191 +172,190 @@
       border-radius: 38px;
     }
 
-    .eyebrow {
+    .badge {
       display: inline-flex;
       align-items: center;
       gap: 8px;
       padding: 8px 12px;
-      border: 1px solid rgba(255,255,255,.16);
       border-radius: 999px;
       background: rgba(0,0,0,.42);
-      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255,255,255,.18);
+      backdrop-filter: blur(16px);
       color: rgba(255,255,255,.76);
       font-size: 10px;
-      font-weight: 900;
-      letter-spacing: 2.4px;
+      font-weight: 950;
+      letter-spacing: 2.2px;
       text-transform: uppercase;
     }
 
-    .dot {
+    .badge-dot {
       width: 7px;
       height: 7px;
       border-radius: 50%;
       background: #fff;
-      box-shadow: 0 0 15px rgba(255,255,255,.9);
+      box-shadow: 0 0 16px rgba(255,255,255,.9);
     }
 
     h1 {
-      margin: 16px 0 6px;
-      font-size: clamp(34px, 11vw, 55px);
-      line-height: .9;
+      margin: 15px 0 8px;
+      font-size: clamp(36px, 12vw, 58px);
+      line-height: .88;
       font-weight: 1000;
       letter-spacing: -2px;
       text-transform: uppercase;
-      text-shadow:
-        0 0 22px rgba(255,255,255,.35),
-        0 16px 34px rgba(0,0,0,.9);
+      text-shadow: 0 0 24px rgba(255,255,255,.34), 0 18px 35px rgba(0,0,0,.9);
     }
 
     .subtitle {
-      max-width: 310px;
+      max-width: 335px;
       margin: 0 auto;
       color: var(--muted);
       font-size: 12px;
       line-height: 1.45;
-      font-weight: 750;
-      letter-spacing: 2px;
+      font-weight: 800;
+      letter-spacing: 1.7px;
       text-transform: uppercase;
     }
 
-    .panel {
+    .buttons-panel {
       position: relative;
       overflow: hidden;
       border-radius: 34px;
-      padding: 18px;
+      padding: 16px;
       background:
-        linear-gradient(145deg, rgba(255,255,255,.14), rgba(255,255,255,.045)),
-        rgba(0,0,0,.62);
+        linear-gradient(145deg, rgba(255,255,255,.14), rgba(255,255,255,.04)),
+        rgba(0,0,0,.66);
       border: 1px solid rgba(255,255,255,.18);
       box-shadow:
-        0 26px 70px rgba(0,0,0,.82),
-        inset 0 1px 0 rgba(255,255,255,.22);
+        0 28px 75px rgba(0,0,0,.86),
+        inset 0 1px 0 rgba(255,255,255,.20);
       backdrop-filter: blur(18px);
     }
 
-    .panel::before {
+    .buttons-panel::before {
       content: "";
       position: absolute;
       inset: -1px;
-      background: linear-gradient(115deg, transparent, rgba(255,255,255,.23), transparent 42%);
-      transform: translateX(-100%);
-      animation: shine 4.5s ease-in-out infinite;
       pointer-events: none;
+      background: linear-gradient(115deg, transparent, rgba(255,255,255,.22), transparent 43%);
+      transform: translateX(-110%);
+      animation: shine 4.8s ease-in-out infinite;
     }
 
     @keyframes shine {
-      0%, 28% { transform: translateX(-110%); }
-      55%, 100% { transform: translateX(110%); }
+      0%, 30% { transform: translateX(-110%); }
+      58%, 100% { transform: translateX(110%); }
     }
 
-    .main-action {
+    .btn {
       position: relative;
-      min-height: 172px;
-      border-radius: 28px;
+      isolation: isolate;
+      width: 100%;
+      border: 0;
+      color: #fff;
+      cursor: pointer;
+      text-align: left;
+      font-family: inherit;
+      overflow: hidden;
+      transition: transform .16s ease, border-color .16s ease;
+    }
+
+    .btn:active {
+      transform: scale(.974);
+    }
+
+    .btn-main {
+      min-height: 168px;
+      border-radius: 29px;
       padding: 20px;
+      background:
+        linear-gradient(to bottom, rgba(255,255,255,.04), rgba(0,0,0,.72)),
+        url("logosfondo.jpg") center / cover no-repeat;
+      border: 1px solid rgba(255,255,255,.20);
+      box-shadow: inset 0 0 45px rgba(255,255,255,.06), 0 18px 42px rgba(0,0,0,.56);
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
-      overflow: hidden;
-      cursor: pointer;
-      background:
-        linear-gradient(to bottom, rgba(255,255,255,.03), rgba(0,0,0,.74)),
-        url("logosfondo.jpg") center / cover no-repeat;
-      border: 1px solid rgba(255,255,255,.2);
-      box-shadow:
-        inset 0 0 45px rgba(255,255,255,.06),
-        0 18px 40px rgba(0,0,0,.58);
-      transition: transform .18s ease, border-color .18s ease;
     }
 
-    .main-action::after {
+    .btn-main::after {
       content: "";
       position: absolute;
-      right: -28px;
-      top: -32px;
-      width: 128px;
-      height: 128px;
+      right: -34px;
+      top: -38px;
+      width: 135px;
+      height: 135px;
       border-radius: 50%;
-      border: 1px solid rgba(255,255,255,.24);
-      box-shadow: inset 0 0 30px rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.25);
+      box-shadow: inset 0 0 30px rgba(255,255,255,.07);
+      z-index: -1;
     }
 
-    .main-action:active,
-    .menu-card:active,
-    .dock a:active,
-    .popup-link:active {
-      transform: scale(.975);
-    }
-
-    .main-action small,
-    .menu-card small {
-      color: rgba(255,255,255,.63);
+    .btn-kicker {
+      color: rgba(255,255,255,.65);
       font-size: 10px;
-      font-weight: 900;
+      font-weight: 950;
       letter-spacing: 2px;
       text-transform: uppercase;
     }
 
-    .main-action strong {
-      margin-top: 8px;
+    .btn-title {
       display: block;
-      font-size: 34px;
-      line-height: .92;
+      margin-top: 7px;
+      font-size: 35px;
+      line-height: .9;
       font-weight: 1000;
-      letter-spacing: -1px;
+      letter-spacing: -1.2px;
       text-transform: uppercase;
     }
 
-    .arrow {
+    .btn-arrow {
       position: absolute;
       top: 18px;
       right: 18px;
-      width: 42px;
-      height: 42px;
-      border-radius: 16px;
+      width: 43px;
+      height: 43px;
       display: grid;
       place-items: center;
-      background: rgba(255,255,255,.12);
+      border-radius: 16px;
+      background: rgba(255,255,255,.13);
       border: 1px solid rgba(255,255,255,.18);
-      font-size: 22px;
-      font-weight: 900;
+      font-size: 23px;
+      font-weight: 1000;
     }
 
-    .menu-grid {
-      margin-top: 14px;
+    .btn-grid {
+      margin-top: 12px;
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
     }
 
-    .menu-card {
-      min-height: 126px;
+    .btn-card {
+      min-height: 120px;
       border-radius: 25px;
       padding: 15px;
-      position: relative;
-      overflow: hidden;
+      background:
+        radial-gradient(circle at top right, rgba(255,255,255,.18), transparent 38%),
+        linear-gradient(150deg, rgba(255,255,255,.12), rgba(255,255,255,.04));
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: inset 0 0 28px rgba(255,255,255,.035), 0 12px 28px rgba(0,0,0,.42);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      cursor: pointer;
-      background:
-        radial-gradient(circle at top right, rgba(255,255,255,.18), transparent 38%),
-        linear-gradient(150deg, rgba(255,255,255,.115), rgba(255,255,255,.035));
-      border: 1px solid rgba(255,255,255,.14);
-      box-shadow: inset 0 0 28px rgba(255,255,255,.035), 0 12px 28px rgba(0,0,0,.42);
-      transition: transform .18s ease, background .18s ease;
     }
 
-    .menu-card::before {
+    .btn-card::before {
       content: "";
       position: absolute;
-      width: 78px;
-      height: 78px;
-      right: -24px;
-      bottom: -24px;
-      border-radius: 28px;
+      width: 75px;
+      height: 75px;
+      right: -25px;
+      bottom: -25px;
+      border-radius: 26px;
       background: rgba(255,255,255,.08);
       transform: rotate(20deg);
+      z-index: -1;
     }
 
     .icon {
@@ -409,44 +370,40 @@
       font-size: 22px;
     }
 
-    .menu-card strong {
-      position: relative;
-      z-index: 1;
+    .btn-card .btn-title {
       font-size: 15px;
       line-height: 1.05;
-      font-weight: 950;
-      letter-spacing: .5px;
-      text-transform: uppercase;
+      letter-spacing: .3px;
     }
 
-    .status-row {
+    .mini-row {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 10px;
-      margin: 14px 0 0;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 9px;
+      margin-top: 12px;
     }
 
-    .status-pill {
-      min-height: 58px;
-      border-radius: 20px;
-      padding: 10px;
+    .mini {
+      min-height: 55px;
+      border-radius: 19px;
+      padding: 10px 6px;
       background: rgba(0,0,0,.34);
-      border: 1px solid rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.10);
       text-align: center;
     }
 
-    .status-pill b {
+    .mini b {
       display: block;
       font-size: 13px;
       letter-spacing: .8px;
     }
 
-    .status-pill span {
+    .mini span {
       display: block;
       margin-top: 4px;
       color: rgba(255,255,255,.55);
       font-size: 8px;
-      font-weight: 900;
+      font-weight: 950;
       letter-spacing: 1.4px;
       text-transform: uppercase;
     }
@@ -531,55 +488,14 @@
       font-size: 18px;
     }
 
-    .dock {
-      position: fixed;
-      left: 14px;
-      right: 14px;
-      bottom: calc(12px + env(safe-area-inset-bottom));
-      z-index: 50;
-      max-width: 492px;
-      margin: 0 auto;
-      height: 72px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      padding: 10px;
-      border-radius: 28px;
-      background: rgba(3,3,3,.72);
-      border: 1px solid rgba(255,255,255,.16);
-      box-shadow: 0 18px 55px rgba(0,0,0,.86), inset 0 1px 0 rgba(255,255,255,.12);
-      backdrop-filter: blur(18px);
-    }
-
-    .dock a {
-      border: 0;
-      border-radius: 20px;
-      background: rgba(255,255,255,.08);
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      text-decoration: none;
-      font-size: 11px;
-      font-weight: 950;
-      letter-spacing: .8px;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: transform .18s ease;
-    }
-
-    .dock span {
-      font-size: 18px;
-      line-height: 1;
-    }
-
     @media (max-width: 370px) {
-      .hero { min-height: 40vh; }
-      .hero .logo { width: 136px; height: 136px; }
-      .menu-card { min-height: 116px; }
-      .main-action strong { font-size: 30px; }
-      .dock a { font-size: 10px; }
+      .page { padding-left: 13px; padding-right: 13px; gap: 14px; }
+      .hero .logo { width: 132px; height: 132px; }
+      h1 { font-size: 36px; }
+      .btn-main { min-height: 145px; }
+      .btn-title { font-size: 30px; }
+      .btn-card { min-height: 108px; padding: 13px; }
+      .icon { width: 39px; height: 39px; border-radius: 15px; font-size: 20px; }
     }
   </style>
 </head>
@@ -593,64 +509,63 @@
   </div>
 
   <div class="app-bg"></div>
-  <div class="noise"></div>
 
-  <main class="shell">
+  <main class="page">
     <section class="hero">
-      <div class="logo-wrap">
+      <div class="logo-ring">
         <img class="logo" src="logopricipale.jpg" alt="LOS SICARIOS" />
       </div>
 
-      <div class="eyebrow"><span class="dot"></span> Private Mobile Catalog</div>
+      <div class="badge"><span class="badge-dot"></span> Telegram Mobile Ready</div>
       <h1>LOS<br>SICARIOS</h1>
-      <p class="subtitle">Accesso rapido ai canali, contatti e catalogo ufficiale</p>
+      <p class="subtitle">Index principale con accesso rapido a catalogo, contatti, canali e recensioni</p>
     </section>
 
-    <section class="panel">
-      <div class="main-action" data-page="catalog.html">
-        <div class="arrow">→</div>
-        <small>Enter the vault</small>
-        <strong>Catalogo</strong>
+    <section class="buttons-panel" aria-label="Menu principale">
+      <button class="btn btn-main" type="button" data-page="catalog.html">
+        <span class="btn-arrow">→</span>
+        <span class="btn-kicker">Accesso principale</span>
+        <strong class="btn-title">Catalogo</strong>
+      </button>
+
+      <div class="btn-grid">
+        <button class="btn btn-card" type="button" data-popup="contacts">
+          <span class="icon">✉️</span>
+          <span>
+            <span class="btn-kicker">Direct</span>
+            <strong class="btn-title">Contacts</strong>
+          </span>
+        </button>
+
+        <button class="btn btn-card" type="button" data-popup="channels">
+          <span class="icon">📡</span>
+          <span>
+            <span class="btn-kicker">Official</span>
+            <strong class="btn-title">Channels</strong>
+          </span>
+        </button>
+
+        <button class="btn btn-card" type="button" data-page="recensioni.html">
+          <span class="icon">★</span>
+          <span>
+            <span class="btn-kicker">Feedback</span>
+            <strong class="btn-title">Recensioni</strong>
+          </span>
+        </button>
+
+        <button class="btn btn-card" type="button" data-popup="created">
+          <span class="icon">⚡</span>
+          <span>
+            <span class="btn-kicker">Design</span>
+            <strong class="btn-title">Created By</strong>
+          </span>
+        </button>
       </div>
 
-      <div class="menu-grid">
-        <div class="menu-card" data-popup="contacts">
-          <div class="icon">✉️</div>
-          <div>
-            <small>Direct</small>
-            <strong>Contacts</strong>
-          </div>
-        </div>
-
-        <div class="menu-card" data-popup="channels">
-          <div class="icon">📡</div>
-          <div>
-            <small>Official</small>
-            <strong>Channels</strong>
-          </div>
-        </div>
-
-        <div class="menu-card" data-page="recensioni.html">
-          <div class="icon">★</div>
-          <div>
-            <small>Feedback</small>
-            <strong>Recensioni</strong>
-          </div>
-        </div>
-
-        <div class="menu-card" data-popup="created">
-          <div class="icon">⚡</div>
-          <div>
-            <small>Design</small>
-            <strong>Created By</strong>
-          </div>
-        </div>
-      </div>
-
-      <div class="status-row">
-        <div class="status-pill"><b>24/7</b><span>Online</span></div>
-        <div class="status-pill"><b>TG</b><span>Ready</span></div>
-        <div class="status-pill"><b>VIP</b><span>Access</span></div>
+      <div class="mini-row" aria-hidden="true">
+        <div class="mini"><b>24/7</b><span>Online</span></div>
+        <div class="mini"><b>TG</b><span>Ready</span></div>
+        <div class="mini"><b>VIP</b><span>Access</span></div>
       </div>
     </section>
   </main>
@@ -664,20 +579,14 @@
     </div>
   </div>
 
-  <nav class="dock" aria-label="Link rapidi">
-    <a data-url="https://t.me/Italianfarm11"><span>✈️</span> Telegram</a>
-    <a data-url="https://instagram.com/"><span>◎</span> Insta</a>
-    <a data-url="https://signal.me/#eu/kRf_X-QX9q6AnKI0IC9lsi2GjAiS7cLKf_MoHkGnHt1U3msPbTJOYJ7C2IOfVkU5"><span>◌</span> Signal</a>
-  </nav>
-
   <script>
     const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 
     if (tg) {
       tg.ready();
       tg.expand();
-      tg.setHeaderColor && tg.setHeaderColor("#000000");
-      tg.setBackgroundColor && tg.setBackgroundColor("#000000");
+      if (tg.setHeaderColor) tg.setHeaderColor("#000000");
+      if (tg.setBackgroundColor) tg.setBackgroundColor("#000000");
     }
 
     const links = {
@@ -708,10 +617,9 @@
     const popupLink2 = document.getElementById("popup-link-2");
 
     function haptic(type) {
-      if (tg && tg.HapticFeedback) {
-        if (type === "impact") tg.HapticFeedback.impactOccurred("medium");
-        if (type === "success") tg.HapticFeedback.notificationOccurred("success");
-      }
+      if (!tg || !tg.HapticFeedback) return;
+      if (type === "impact") tg.HapticFeedback.impactOccurred("medium");
+      if (type === "success") tg.HapticFeedback.notificationOccurred("success");
     }
 
     function openExternal(url) {
@@ -728,9 +636,10 @@
     function openPopup(type) {
       const data = links[type];
       if (!data) return;
-      haptic("success");
 
+      haptic("success");
       popupTitle.textContent = data.title;
+
       popupLink1.textContent = data.firstText;
       popupLink1.href = data.firstUrl;
       popupLink1.onclick = function(event) {
@@ -766,7 +675,7 @@
         const loader = document.getElementById("loader");
         loader.style.opacity = "0";
         loader.style.visibility = "hidden";
-      }, 950);
+      }, 900);
     });
 
     document.addEventListener("click", function(event) {
@@ -783,12 +692,6 @@
         return;
       }
 
-      const externalButton = event.target.closest("[data-url]");
-      if (externalButton) {
-        openExternal(externalButton.dataset.url);
-        return;
-      }
-
       if (event.target === popup) {
         closePopup();
       }
@@ -800,4 +703,3 @@
   </script>
 </body>
 </html>
-
