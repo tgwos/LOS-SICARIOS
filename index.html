@@ -9,14 +9,6 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
-    :root {
-      --white: #ffffff;
-      --muted: rgba(255,255,255,.64);
-      --line: rgba(255,255,255,.16);
-      --glass: rgba(255,255,255,.08);
-      --glass-strong: rgba(255,255,255,.14);
-    }
-
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
@@ -27,43 +19,78 @@
       margin: 0;
       min-height: 100%;
       background: #000;
-      color: var(--white);
+      color: #fff;
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Arial, sans-serif;
       overflow-x: hidden;
     }
 
     body {
       min-height: 100vh;
-      padding-bottom: calc(18px + env(safe-area-inset-bottom));
+      padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
     }
 
-    .app-bg {
+    .bg {
       position: fixed;
       inset: 0;
-      z-index: -3;
+      z-index: -5;
       background: url("logosfondo.jpg") center / cover no-repeat;
-      transform: scale(1.04);
+      transform: scale(1.08);
+      filter: contrast(1.08) brightness(.88);
     }
 
-    .app-bg::before {
+    .bg::before {
       content: "";
       position: absolute;
       inset: 0;
       background:
-        radial-gradient(circle at 50% 0%, rgba(255,255,255,.25), transparent 24%),
-        radial-gradient(circle at 20% 34%, rgba(255,255,255,.12), transparent 22%),
-        linear-gradient(to bottom, rgba(0,0,0,.42), rgba(0,0,0,.83) 46%, rgba(0,0,0,.98));
+        radial-gradient(circle at 50% 6%, rgba(255,255,255,.22), transparent 22%),
+        radial-gradient(circle at 14% 80%, rgba(255,255,255,.10), transparent 26%),
+        radial-gradient(circle at 88% 52%, rgba(255,255,255,.08), transparent 28%),
+        linear-gradient(to bottom, rgba(0,0,0,.34), rgba(0,0,0,.82) 46%, rgba(0,0,0,.98));
     }
 
-    .app-bg::after {
-      content: "";
-      position: absolute;
+    .grid-bg {
+      position: fixed;
       inset: 0;
+      z-index: -4;
+      opacity: .22;
       background-image:
-        linear-gradient(rgba(255,255,255,.032) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.032) 1px, transparent 1px);
-      background-size: 36px 36px;
-      mask-image: linear-gradient(to bottom, rgba(0,0,0,.85), transparent 70%);
+        linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+      background-size: 34px 34px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,.7), transparent 78%);
+    }
+
+    .glow {
+      position: fixed;
+      z-index: -3;
+      border-radius: 999px;
+      filter: blur(72px);
+      pointer-events: none;
+      opacity: .34;
+      animation: float 9s ease-in-out infinite;
+    }
+
+    .glow.one {
+      width: 210px;
+      height: 210px;
+      top: -58px;
+      right: -54px;
+      background: rgba(255,255,255,.20);
+    }
+
+    .glow.two {
+      width: 190px;
+      height: 190px;
+      bottom: 36px;
+      left: -66px;
+      background: rgba(255,255,255,.13);
+      animation-delay: 2s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate3d(0,0,0) scale(1); }
+      50% { transform: translate3d(12px,22px,0) scale(1.08); }
     }
 
     #loader {
@@ -73,338 +100,370 @@
       display: grid;
       place-items: center;
       background:
-        linear-gradient(rgba(0,0,0,.35), rgba(0,0,0,.95)),
+        linear-gradient(rgba(0,0,0,.22), rgba(0,0,0,.96)),
         url("logosfondo.jpg") center / cover no-repeat;
       transition: opacity .45s ease, visibility .45s ease;
     }
 
-    .loader-card {
+    .loader-orbit {
       position: relative;
-      text-align: center;
-      animation: enter .9s ease both;
+      width: 230px;
+      height: 230px;
+      display: grid;
+      place-items: center;
     }
 
-    .loader-card::before {
+    .loader-orbit::before,
+    .loader-orbit::after {
       content: "";
       position: absolute;
-      inset: -34px;
+      inset: 0;
       border-radius: 50%;
       border: 1px solid rgba(255,255,255,.22);
-      box-shadow: 0 0 90px rgba(255,255,255,.16), inset 0 0 60px rgba(255,255,255,.08);
-      animation: pulse 1.8s ease-in-out infinite;
+      box-shadow: inset 0 0 45px rgba(255,255,255,.06), 0 0 70px rgba(255,255,255,.13);
+      animation: spin 5s linear infinite;
+    }
+
+    .loader-orbit::after {
+      inset: 18px;
+      opacity: .55;
+      animation-direction: reverse;
+      animation-duration: 7s;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
 
     .logo {
-      position: relative;
-      width: 142px;
-      height: 142px;
+      width: 134px;
+      height: 134px;
       object-fit: cover;
       border-radius: 36px;
       border: 1px solid rgba(255,255,255,.34);
       background: rgba(255,255,255,.06);
-      box-shadow:
-        0 0 36px rgba(255,255,255,.18),
-        0 24px 60px rgba(0,0,0,.85),
-        inset 0 0 26px rgba(255,255,255,.08);
+      box-shadow: 0 24px 70px rgba(0,0,0,.86), 0 0 42px rgba(255,255,255,.18);
     }
 
-    .loader-title {
-      position: relative;
-      margin-top: 22px;
-      font-size: 22px;
-      font-weight: 1000;
-      letter-spacing: 8px;
-      text-shadow: 0 0 26px rgba(255,255,255,.62);
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(.94); opacity: .7; }
-      50% { transform: scale(1.05); opacity: 1; }
-    }
-
-    @keyframes enter {
-      from { opacity: 0; transform: translateY(18px) scale(.92); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
-    .page {
+    .app {
       width: 100%;
       max-width: 520px;
       min-height: 100vh;
       margin: 0 auto;
-      padding: 22px 16px calc(22px + env(safe-area-inset-bottom));
+      padding: 18px 16px calc(18px + env(safe-area-inset-bottom));
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: space-between;
       gap: 18px;
     }
 
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 11px 8px 8px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.44);
+      border: 1px solid rgba(255,255,255,.14);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 16px 35px rgba(0,0,0,.45);
+    }
+
+    .brand-chip img {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      object-fit: cover;
+    }
+
+    .brand-chip span {
+      font-size: 10px;
+      font-weight: 1000;
+      letter-spacing: 1.7px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.78);
+    }
+
+    .signal-dot {
+      width: 42px;
+      height: 42px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.14);
+      backdrop-filter: blur(16px);
+      box-shadow: inset 0 0 20px rgba(255,255,255,.04);
+    }
+
+    .signal-dot::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 18px rgba(255,255,255,.95);
+      animation: blink 1.6s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%,100% { opacity: .45; transform: scale(.85); }
+      50% { opacity: 1; transform: scale(1.1); }
+    }
+
     .hero {
-      text-align: center;
-      padding-top: 10px;
+      text-align: left;
+      padding-top: 12px;
     }
 
-    .logo-ring {
+    .hero-logo {
       position: relative;
-      width: fit-content;
-      margin: 0 auto 20px;
+      width: 156px;
+      height: 156px;
+      margin: 8px 0 22px;
     }
 
-    .logo-ring::before,
-    .logo-ring::after {
+    .hero-logo::before {
       content: "";
       position: absolute;
-      inset: -14px;
-      border-radius: 45px;
+      inset: -18px;
+      border-radius: 46px;
       border: 1px solid rgba(255,255,255,.22);
-      transform: rotate(8deg);
-    }
-
-    .logo-ring::after {
-      inset: -24px;
-      opacity: .35;
       transform: rotate(-8deg);
     }
 
-    .hero .logo {
-      width: 154px;
-      height: 154px;
-      border-radius: 38px;
+    .hero-logo::after {
+      content: "";
+      position: absolute;
+      inset: -30px;
+      border-radius: 54px;
+      border: 1px solid rgba(255,255,255,.10);
+      transform: rotate(10deg);
     }
 
-    .badge {
+    .hero-logo .logo {
+      width: 156px;
+      height: 156px;
+      border-radius: 39px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .kicker {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(0,0,0,.42);
-      border: 1px solid rgba(255,255,255,.18);
-      backdrop-filter: blur(16px);
-      color: rgba(255,255,255,.76);
+      color: rgba(255,255,255,.66);
       font-size: 10px;
-      font-weight: 950;
+      font-weight: 1000;
       letter-spacing: 2.2px;
       text-transform: uppercase;
     }
 
-    .badge-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #fff;
-      box-shadow: 0 0 16px rgba(255,255,255,.9);
+    .kicker::before {
+      content: "";
+      width: 26px;
+      height: 1px;
+      background: rgba(255,255,255,.44);
+      box-shadow: 0 0 12px rgba(255,255,255,.55);
     }
 
     h1 {
-      margin: 15px 0 8px;
-      font-size: clamp(36px, 12vw, 58px);
-      line-height: .88;
+      margin: 12px 0 0;
+      font-size: clamp(45px, 15vw, 76px);
+      line-height: .78;
+      letter-spacing: -4px;
       font-weight: 1000;
-      letter-spacing: -2px;
       text-transform: uppercase;
-      text-shadow: 0 0 24px rgba(255,255,255,.34), 0 18px 35px rgba(0,0,0,.9);
+      text-shadow: 0 0 22px rgba(255,255,255,.28), 0 18px 42px rgba(0,0,0,.9);
     }
 
-    .subtitle {
-      max-width: 335px;
-      margin: 0 auto;
-      color: var(--muted);
+    .wordmark {
+      margin-top: 12px;
+      color: rgba(255,255,255,.58);
       font-size: 12px;
       line-height: 1.45;
-      font-weight: 800;
-      letter-spacing: 1.7px;
+      font-weight: 850;
+      letter-spacing: 1.6px;
       text-transform: uppercase;
+      max-width: 310px;
     }
 
-    .buttons-panel {
+    .vault {
       position: relative;
-      overflow: hidden;
-      border-radius: 34px;
-      padding: 16px;
+      padding: 15px;
+      border-radius: 38px;
       background:
-        linear-gradient(145deg, rgba(255,255,255,.14), rgba(255,255,255,.04)),
-        rgba(0,0,0,.66);
+        linear-gradient(145deg, rgba(255,255,255,.14), rgba(255,255,255,.035)),
+        rgba(0,0,0,.64);
       border: 1px solid rgba(255,255,255,.18);
-      box-shadow:
-        0 28px 75px rgba(0,0,0,.86),
-        inset 0 1px 0 rgba(255,255,255,.20);
-      backdrop-filter: blur(18px);
+      backdrop-filter: blur(22px);
+      box-shadow: 0 30px 90px rgba(0,0,0,.88), inset 0 1px 0 rgba(255,255,255,.20);
+      overflow: hidden;
     }
 
-    .buttons-panel::before {
+    .vault::before {
       content: "";
       position: absolute;
       inset: -1px;
-      pointer-events: none;
       background: linear-gradient(115deg, transparent, rgba(255,255,255,.22), transparent 43%);
-      transform: translateX(-110%);
-      animation: shine 4.8s ease-in-out infinite;
+      animation: shine 5s ease-in-out infinite;
+      pointer-events: none;
     }
 
     @keyframes shine {
-      0%, 30% { transform: translateX(-110%); }
-      58%, 100% { transform: translateX(110%); }
+      0%, 35% { transform: translateX(-110%); }
+      65%, 100% { transform: translateX(110%); }
     }
 
-    .btn {
+    .catalog-btn {
       position: relative;
-      isolation: isolate;
       width: 100%;
+      min-height: 235px;
       border: 0;
+      border-radius: 32px;
       color: #fff;
-      cursor: pointer;
       text-align: left;
-      font-family: inherit;
       overflow: hidden;
-      transition: transform .16s ease, border-color .16s ease;
-    }
-
-    .btn:active {
-      transform: scale(.974);
-    }
-
-    .btn-main {
-      min-height: 168px;
-      border-radius: 29px;
-      padding: 20px;
+      cursor: pointer;
+      padding: 22px;
       background:
-        linear-gradient(to bottom, rgba(255,255,255,.04), rgba(0,0,0,.72)),
+        linear-gradient(to bottom, rgba(255,255,255,.02), rgba(0,0,0,.78)),
         url("logosfondo.jpg") center / cover no-repeat;
-      border: 1px solid rgba(255,255,255,.20);
-      box-shadow: inset 0 0 45px rgba(255,255,255,.06), 0 18px 42px rgba(0,0,0,.56);
+      border: 1px solid rgba(255,255,255,.22);
+      box-shadow: inset 0 0 60px rgba(255,255,255,.07), 0 22px 55px rgba(0,0,0,.65);
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
+      isolation: isolate;
     }
 
-    .btn-main::after {
-      content: "";
-      position: absolute;
-      right: -34px;
-      top: -38px;
-      width: 135px;
-      height: 135px;
-      border-radius: 50%;
-      border: 1px solid rgba(255,255,255,.25);
-      box-shadow: inset 0 0 30px rgba(255,255,255,.07);
-      z-index: -1;
-    }
-
-    .btn-kicker {
-      color: rgba(255,255,255,.65);
-      font-size: 10px;
-      font-weight: 950;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-    }
-
-    .btn-title {
-      display: block;
-      margin-top: 7px;
-      font-size: 35px;
-      line-height: .9;
-      font-weight: 1000;
-      letter-spacing: -1.2px;
-      text-transform: uppercase;
-    }
-
-    .btn-arrow {
+    .catalog-btn::before {
+      content: "CATALOGO";
       position: absolute;
       top: 18px;
-      right: 18px;
-      width: 43px;
-      height: 43px;
-      display: grid;
-      place-items: center;
-      border-radius: 16px;
-      background: rgba(255,255,255,.13);
-      border: 1px solid rgba(255,255,255,.18);
-      font-size: 23px;
+      left: 20px;
+      font-size: 10px;
+      letter-spacing: 2.4px;
       font-weight: 1000;
+      color: rgba(255,255,255,.64);
+      z-index: 1;
     }
 
-    .btn-grid {
-      margin-top: 12px;
+    .catalog-btn::after {
+      content: "01";
+      position: absolute;
+      right: 18px;
+      top: 15px;
+      font-size: 54px;
+      line-height: 1;
+      font-weight: 1000;
+      color: rgba(255,255,255,.09);
+    }
+
+    .catalog-title {
+      position: relative;
+      z-index: 1;
+      display: block;
+      font-size: 45px;
+      line-height: .88;
+      letter-spacing: -2px;
+      font-weight: 1000;
+      text-transform: uppercase;
+    }
+
+    .catalog-sub {
+      position: relative;
+      z-index: 1;
+      display: block;
+      margin-top: 8px;
+      color: rgba(255,255,255,.62);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+    }
+
+    .quick-grid {
+      margin-top: 13px;
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
     }
 
-    .btn-card {
-      min-height: 120px;
-      border-radius: 25px;
-      padding: 15px;
+    .quick-btn {
+      position: relative;
+      min-height: 132px;
+      border: 0;
+      border-radius: 26px;
+      padding: 13px;
+      color: #fff;
+      text-align: left;
+      cursor: pointer;
+      overflow: hidden;
       background:
-        radial-gradient(circle at top right, rgba(255,255,255,.18), transparent 38%),
-        linear-gradient(150deg, rgba(255,255,255,.12), rgba(255,255,255,.04));
-      border: 1px solid rgba(255,255,255,.14);
-      box-shadow: inset 0 0 28px rgba(255,255,255,.035), 0 12px 28px rgba(0,0,0,.42);
+        radial-gradient(circle at top right, rgba(255,255,255,.21), transparent 34%),
+        linear-gradient(155deg, rgba(255,255,255,.12), rgba(255,255,255,.035));
+      border: 1px solid rgba(255,255,255,.15);
+      box-shadow: inset 0 0 28px rgba(255,255,255,.035), 0 14px 32px rgba(0,0,0,.48);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
     }
 
-    .btn-card::before {
+    .quick-btn::after {
       content: "";
       position: absolute;
-      width: 75px;
-      height: 75px;
-      right: -25px;
-      bottom: -25px;
-      border-radius: 26px;
+      width: 70px;
+      height: 70px;
+      right: -30px;
+      bottom: -28px;
+      border-radius: 24px;
       background: rgba(255,255,255,.08);
-      transform: rotate(20deg);
-      z-index: -1;
+      transform: rotate(18deg);
     }
 
-    .icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 17px;
+    .quick-btn:active,
+    .catalog-btn:active {
+      transform: scale(.975);
+    }
+
+    .ico {
+      width: 42px;
+      height: 42px;
+      border-radius: 16px;
       display: grid;
       place-items: center;
       background: rgba(255,255,255,.12);
       border: 1px solid rgba(255,255,255,.16);
+      font-size: 21px;
       box-shadow: inset 0 0 18px rgba(255,255,255,.045);
-      font-size: 22px;
     }
 
-    .btn-card .btn-title {
-      font-size: 15px;
-      line-height: 1.05;
-      letter-spacing: .3px;
-    }
-
-    .mini-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 9px;
-      margin-top: 12px;
-    }
-
-    .mini {
-      min-height: 55px;
-      border-radius: 19px;
-      padding: 10px 6px;
-      background: rgba(0,0,0,.34);
-      border: 1px solid rgba(255,255,255,.10);
-      text-align: center;
-    }
-
-    .mini b {
+    .quick-btn small {
       display: block;
+      color: rgba(255,255,255,.56);
+      font-size: 9px;
+      font-weight: 1000;
+      letter-spacing: 1.6px;
+      text-transform: uppercase;
+    }
+
+    .quick-btn strong {
+      display: block;
+      margin-top: 5px;
       font-size: 13px;
-      letter-spacing: .8px;
-    }
-
-    .mini span {
-      display: block;
-      margin-top: 4px;
-      color: rgba(255,255,255,.55);
-      font-size: 8px;
-      font-weight: 950;
-      letter-spacing: 1.4px;
+      line-height: 1;
+      font-weight: 1000;
+      letter-spacing: .2px;
       text-transform: uppercase;
     }
 
@@ -417,7 +476,7 @@
       justify-content: center;
       padding: 16px 16px calc(18px + env(safe-area-inset-bottom));
       background: rgba(0,0,0,.72);
-      backdrop-filter: blur(13px);
+      backdrop-filter: blur(14px);
       opacity: 0;
       pointer-events: none;
       transition: opacity .22s ease;
@@ -431,13 +490,13 @@
     .popup-box {
       width: 100%;
       max-width: 480px;
-      border-radius: 30px;
+      border-radius: 31px;
       padding: 20px;
       background:
-        linear-gradient(145deg, rgba(255,255,255,.13), rgba(255,255,255,.04)),
-        rgba(4,4,4,.94);
+        linear-gradient(145deg, rgba(255,255,255,.14), rgba(255,255,255,.04)),
+        rgba(5,5,5,.95);
       border: 1px solid rgba(255,255,255,.18);
-      box-shadow: 0 24px 80px rgba(0,0,0,.88), inset 0 1px 0 rgba(255,255,255,.18);
+      box-shadow: 0 24px 80px rgba(0,0,0,.9), inset 0 1px 0 rgba(255,255,255,.18);
       transform: translateY(22px) scale(.98);
       transition: transform .22s ease;
     }
@@ -446,133 +505,143 @@
       transform: translateY(0) scale(1);
     }
 
-    .popup-handle {
-      width: 46px;
+    .handle {
+      width: 48px;
       height: 5px;
       border-radius: 999px;
       margin: 0 auto 18px;
-      background: rgba(255,255,255,.25);
+      background: rgba(255,255,255,.24);
     }
 
     .popup-title {
       margin-bottom: 14px;
-      font-size: 24px;
+      text-align: center;
+      font-size: 26px;
       line-height: 1;
       font-weight: 1000;
       letter-spacing: -1px;
       text-transform: uppercase;
-      text-align: center;
     }
 
     .popup-link {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
-      min-height: 58px;
+      min-height: 60px;
       padding: 16px;
       margin-top: 10px;
       color: #fff;
       text-decoration: none;
-      border-radius: 20px;
+      border-radius: 21px;
       background: rgba(255,255,255,.09);
       border: 1px solid rgba(255,255,255,.13);
       font-size: 15px;
-      font-weight: 900;
-      letter-spacing: .5px;
+      font-weight: 950;
     }
 
     .popup-link::after {
       content: "↗";
-      opacity: .75;
+      opacity: .72;
       font-size: 18px;
     }
 
-    @media (max-width: 370px) {
-      .page { padding-left: 13px; padding-right: 13px; gap: 14px; }
-      .hero .logo { width: 132px; height: 132px; }
-      h1 { font-size: 36px; }
-      .btn-main { min-height: 145px; }
-      .btn-title { font-size: 30px; }
-      .btn-card { min-height: 108px; padding: 13px; }
-      .icon { width: 39px; height: 39px; border-radius: 15px; font-size: 20px; }
+    @media (max-width: 390px) {
+      .app { padding-left: 13px; padding-right: 13px; }
+      .hero-logo, .hero-logo .logo { width: 134px; height: 134px; }
+      h1 { font-size: 46px; }
+      .catalog-btn { min-height: 205px; }
+      .catalog-title { font-size: 38px; }
+      .quick-grid { gap: 8px; }
+      .quick-btn { min-height: 118px; padding: 11px; border-radius: 23px; }
+      .ico { width: 38px; height: 38px; border-radius: 14px; font-size: 19px; }
+      .quick-btn strong { font-size: 11px; }
     }
   </style>
 </head>
 
 <body>
   <div id="loader">
-    <div class="loader-card">
+    <div class="loader-orbit">
       <img class="logo" src="logopricipale.jpg" alt="LOS SICARIOS" />
-      <div class="loader-title">LOS SICARIOS</div>
     </div>
   </div>
 
-  <div class="app-bg"></div>
+  <div class="bg"></div>
+  <div class="grid-bg"></div>
+  <div class="glow one"></div>
+  <div class="glow two"></div>
 
-  <main class="page">
-    <section class="hero">
-      <div class="logo-ring">
-        <img class="logo" src="logopricipale.jpg" alt="LOS SICARIOS" />
+  <main class="app">
+    <header class="topbar">
+      <div class="brand-chip">
+        <img src="logopricipale.jpg" alt="Logo" />
+        <span>Private Access</span>
       </div>
+      <div class="signal-dot" aria-hidden="true"></div>
+    </header>
 
-      <div class="badge"><span class="badge-dot"></span> Telegram Mobile Ready</div>
-      <h1>LOS<br>SICARIOS</h1>
-      <p class="subtitle">Index principale con accesso rapido a catalogo, contatti, canali e recensioni</p>
+    <section class="hero">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;">
+        <div>
+          <div class="kicker">Exclusive Access</div>
+          <h1 style="margin-top:10px;">LOS<br>SICARIOS</h1>
+          <div class="wordmark">Design ispirato a Spotify, Apple Music e Netflix mobile.</div>
+        </div>
+
+        <div class="hero-logo" style="width:110px;height:110px;margin:0;">
+          <img class="logo" src="logopricipale.jpg" alt="LOS SICARIOS" style="width:110px;height:110px;border-radius:28px;" />
+        </div>
+      </div>
     </section>
 
-    <section class="buttons-panel" aria-label="Menu principale">
-      <button class="btn btn-main" type="button" data-page="catalog.html">
-        <span class="btn-arrow">→</span>
-        <span class="btn-kicker">Accesso principale</span>
-        <strong class="btn-title">Catalogo</strong>
-      </button>
+    <section class="vault" aria-label="Menu principale">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <div>
+          <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.5);font-weight:900;">Main Access</div>
+          <div style="margin-top:5px;font-size:24px;font-weight:1000;letter-spacing:-1px;">Dashboard</div>
+        </div>
 
-      <div class="btn-grid">
-        <button class="btn btn-card" type="button" data-popup="contacts">
-          <span class="icon">✉️</span>
-          <span>
-            <span class="btn-kicker">Direct</span>
-            <strong class="btn-title">Contacts</strong>
-          </span>
-        </button>
-
-        <button class="btn btn-card" type="button" data-popup="channels">
-          <span class="icon">📡</span>
-          <span>
-            <span class="btn-kicker">Official</span>
-            <strong class="btn-title">Channels</strong>
-          </span>
-        </button>
-
-        <button class="btn btn-card" type="button" data-page="recensioni.html">
-          <span class="icon">★</span>
-          <span>
-            <span class="btn-kicker">Feedback</span>
-            <strong class="btn-title">Recensioni</strong>
-          </span>
-        </button>
-
-        <button class="btn btn-card" type="button" data-popup="created">
-          <span class="icon">⚡</span>
-          <span>
-            <span class="btn-kicker">Design</span>
-            <strong class="btn-title">Created By</strong>
-          </span>
-        </button>
+        <div style="width:44px;height:44px;border-radius:16px;background:rgba(255,255,255,.08);display:grid;place-items:center;border:1px solid rgba(255,255,255,.12);font-size:18px;">✦</div>
       </div>
 
-      <div class="mini-row" aria-hidden="true">
-        <div class="mini"><b>24/7</b><span>Online</span></div>
-        <div class="mini"><b>TG</b><span>Ready</span></div>
-        <div class="mini"><b>VIP</b><span>Access</span></div>
+      <button class="catalog-btn" type="button" data-page="catalog.html" style="min-height:180px;border-radius:34px;">
+        <span class="catalog-title" style="font-size:42px;">Catalogo</span>
+        <span class="catalog-sub">Accesso completo</span>
+      </button>
+
+      <div style="margin-top:14px;display:grid;gap:12px;">
+
+        <button class="quick-btn" type="button" data-popup="contacts" style="min-height:88px;border-radius:24px;display:flex;flex-direction:row;align-items:center;gap:14px;">
+          <div class="ico">✉️</div>
+          <div style="text-align:left;">
+            <small>Direct Access</small>
+            <strong style="font-size:18px;">Contatti</strong>
+          </div>
+        </button>
+
+        <button class="quick-btn" type="button" data-popup="channels" style="min-height:88px;border-radius:24px;display:flex;flex-direction:row;align-items:center;gap:14px;">
+          <div class="ico">📡</div>
+          <div style="text-align:left;">
+            <small>Official Group</small>
+            <strong style="font-size:18px;">Channel</strong>
+          </div>
+        </button>
+
+        <button class="quick-btn" type="button" data-page="recensioni.html" style="min-height:88px;border-radius:24px;display:flex;flex-direction:row;align-items:center;gap:14px;">
+          <div class="ico">★</div>
+          <div style="text-align:left;">
+            <small>User Feedback</small>
+            <strong style="font-size:18px;">Recensioni</strong>
+          </div>
+        </button>
+
       </div>
     </section>
   </main>
 
   <div id="popup" class="popup-overlay" aria-hidden="true">
     <div class="popup-box" role="dialog" aria-modal="true">
-      <div class="popup-handle"></div>
+      <div class="handle"></div>
       <div class="popup-title" id="popup-title"></div>
       <a class="popup-link" id="popup-link-1" href="#" target="_blank" rel="noopener"></a>
       <a class="popup-link" id="popup-link-2" href="#" target="_blank" rel="noopener" style="display:none;"></a>
@@ -591,7 +660,7 @@
 
     const links = {
       contacts: {
-        title: "Contact",
+        title: "Contatti",
         firstText: "📨 Telegram",
         firstUrl: "https://t.me/Italianfarm11",
         secondText: "📞 Signal",
@@ -603,11 +672,6 @@
         firstUrl: "https://t.me/+TJZTE4SGZBRhNTE0",
         secondText: "📞 Signal Group",
         secondUrl: "https://signal.group/#CjQKIDNGRGl9UmFJzST3ADxn0PsPIc0zsRWW1foOy3Ity-KvEhBjRjUNbHUuV1qczApKp_ok"
-      },
-      created: {
-        title: "Created By",
-        firstText: "👨‍💻 BOX CREATE",
-        firstUrl: "https://t.me/boxcreate22"
       }
     };
 
@@ -639,7 +703,6 @@
 
       haptic("success");
       popupTitle.textContent = data.title;
-
       popupLink1.textContent = data.firstText;
       popupLink1.href = data.firstUrl;
       popupLink1.onclick = function(event) {
@@ -675,7 +738,7 @@
         const loader = document.getElementById("loader");
         loader.style.opacity = "0";
         loader.style.visibility = "hidden";
-      }, 900);
+      }, 5000);
     });
 
     document.addEventListener("click", function(event) {
@@ -692,9 +755,7 @@
         return;
       }
 
-      if (event.target === popup) {
-        closePopup();
-      }
+      if (event.target === popup) closePopup();
     });
 
     document.addEventListener("keydown", function(event) {
