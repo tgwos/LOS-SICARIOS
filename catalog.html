@@ -223,13 +223,13 @@
 
     .products {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
+      grid-template-columns: 1fr;
+      gap: 14px;
     }
 
     .product {
       position: relative;
-      min-height: 210px;
+      min-height: 240px;
       border: 0;
       border-radius: 27px;
       overflow: hidden;
@@ -362,24 +362,51 @@
 
     .media-wrap {
       position: relative;
-      flex: 1;
-      min-height: 0;
+      width: 100%;
+      min-height: 220px;
+      max-height: 62vh;
       display: grid;
       place-items: center;
       border-radius: 30px;
       overflow: hidden;
-      background: rgba(255,255,255,.06);
+      background: rgba(0,0,0,.55);
       border: 1px solid rgba(255,255,255,.13);
       box-shadow: 0 24px 70px rgba(0,0,0,.7);
+    }
+
+    .media-wrap.portrait {
+      aspect-ratio: 9 / 16;
+      max-height: 62vh;
+      margin: 0 auto;
+      width: min(100%, 360px);
+    }
+
+    .media-wrap.landscape {
+      aspect-ratio: 16 / 9;
+      width: 100%;
+    }
+
+    .media-wrap.square {
+      aspect-ratio: 1 / 1;
+      width: min(100%, 420px);
+      margin: 0 auto;
     }
 
     .media-wrap img,
     .media-wrap video {
       width: 100%;
       height: 100%;
-      max-height: 64vh;
+      max-height: 62vh;
       object-fit: contain;
       background: #000;
+      display: block;
+    }
+
+    #mediaContainer {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      place-items: center;
     }
 
     .nav-btn {
@@ -471,8 +498,8 @@
     }
 
     @media (max-width: 370px) {
-      .products { gap: 10px; }
-      .product { min-height: 185px; border-radius: 24px; }
+      .products { gap: 12px; }
+      .product { min-height: 220px; border-radius: 24px; }
       .product-name { font-size: 13px; }
       h1 { font-size: 38px; }
     }
@@ -492,7 +519,8 @@
       </div>
     </header>
 
-    <section class="hero">
+    <section class="hero">//dd
+      <div class="subtitle">
       <div class="search-box">
         <input id="searchInput" type="search" placeholder="Cerca varietà o prodotto" autocomplete="off" />
       </div>
@@ -519,7 +547,7 @@
     <div class="details">
       <h2 id="detailName">Nome</h2>
       <div class="prices" id="prices"></div>
-      <button class="contact-btn" id="contactBtn" type="button">💬 Richiedi info</button>
+      <button class="contact-btn" id="contactBtn" type="button">💬 ordina </button>
     </div>
   </section>
 
@@ -619,15 +647,38 @@
       currentVideo = null;
     }
 
+    function setMediaLayout(width, height) {
+      const wrap = document.querySelector(".media-wrap");
+      wrap.classList.remove("portrait", "landscape", "square");
+
+      if (!width || !height) {
+        wrap.classList.add("landscape");
+        return;
+      }
+
+      const ratio = width / height;
+      if (ratio < 0.85) {
+        wrap.classList.add("portrait");
+      } else if (ratio > 1.2) {
+        wrap.classList.add("landscape");
+      } else {
+        wrap.classList.add("square");
+      }
+    }
+
     function loadMedia() {
       stopVideo();
       mediaContainer.innerHTML = "";
+      setMediaLayout(16, 9);
 
       const media = currentProduct && currentProduct.media ? currentProduct.media : [];
       if (!media.length) {
         const img = document.createElement("img");
         img.src = currentProduct.previewImage || "logosfondo.jpg";
         img.alt = currentProduct.name || "Anteprima";
+        img.onload = function() {
+          setMediaLayout(img.naturalWidth, img.naturalHeight);
+        };
         mediaContainer.appendChild(img);
         return;
       }
@@ -640,6 +691,9 @@
         video.controls = true;
         video.playsInline = true;
         video.preload = "metadata";
+        video.onloadedmetadata = function() {
+          setMediaLayout(video.videoWidth, video.videoHeight);
+        };
         mediaContainer.appendChild(video);
         currentVideo = video;
         video.play().catch(() => {});
@@ -648,6 +702,9 @@
         img.src = selected.src;
         img.alt = currentProduct.name || "Media";
         img.loading = "lazy";
+        img.onload = function() {
+          setMediaLayout(img.naturalWidth, img.naturalHeight);
+        };
         mediaContainer.appendChild(img);
       }
     }
