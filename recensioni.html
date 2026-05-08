@@ -1,1 +1,500 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#000000" />
+  <title>RECENSIONI - LOS SICARIOS</title>
 
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: #000;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Arial, sans-serif;
+      overflow-x: hidden;
+    }
+
+    body {
+      min-height: 100vh;
+      padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+    }
+
+    .bg {
+      position: fixed;
+      inset: 0;
+      z-index: -5;
+      background: url("logosfondo.jpg") center / cover no-repeat;
+      transform: scale(1.08);
+      filter: contrast(1.08) brightness(.88);
+    }
+
+    .bg::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 50% 6%, rgba(255,255,255,.22), transparent 22%),
+        radial-gradient(circle at 14% 80%, rgba(255,255,255,.10), transparent 26%),
+        radial-gradient(circle at 88% 52%, rgba(255,255,255,.08), transparent 28%),
+        linear-gradient(to bottom, rgba(0,0,0,.34), rgba(0,0,0,.82) 46%, rgba(0,0,0,.98));
+    }
+
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -4;
+      opacity: .22;
+      background-image:
+        linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+      background-size: 34px 34px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,.7), transparent 78%);
+    }
+
+    .glow {
+      position: fixed;
+      z-index: -3;
+      border-radius: 999px;
+      filter: blur(72px);
+      pointer-events: none;
+      opacity: .34;
+      animation: float 9s ease-in-out infinite;
+    }
+
+    .glow.one {
+      width: 210px;
+      height: 210px;
+      top: -58px;
+      right: -54px;
+      background: rgba(255,255,255,.20);
+    }
+
+    .glow.two {
+      width: 190px;
+      height: 190px;
+      bottom: 36px;
+      left: -66px;
+      background: rgba(255,255,255,.13);
+      animation-delay: 2s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate3d(0,0,0) scale(1); }
+      50% { transform: translate3d(12px,22px,0) scale(1.08); }
+    }
+
+    .app {
+      width: 100%;
+      max-width: 520px;
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 18px 16px calc(22px + env(safe-area-inset-bottom));
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 26px;
+    }
+
+    .brand-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 11px 8px 8px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.44);
+      border: 1px solid rgba(255,255,255,.14);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 16px 35px rgba(0,0,0,.45);
+    }
+
+    .brand-chip img {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      object-fit: cover;
+    }
+
+    .brand-chip span {
+      font-size: 10px;
+      font-weight: 1000;
+      letter-spacing: 1.7px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.78);
+    }
+
+    .back-home {
+      width: 42px;
+      height: 42px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      text-decoration: none;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.14);
+      backdrop-filter: blur(16px);
+      font-size: 20px;
+    }
+
+    .hero {
+      margin-bottom: 22px;
+    }
+
+    .kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: rgba(255,255,255,.66);
+      font-size: 10px;
+      font-weight: 1000;
+      letter-spacing: 2.2px;
+      text-transform: uppercase;
+    }
+
+    .kicker::before {
+      content: "";
+      width: 26px;
+      height: 1px;
+      background: rgba(255,255,255,.44);
+      box-shadow: 0 0 12px rgba(255,255,255,.55);
+    }
+
+    h1 {
+      margin: 12px 0 0;
+      font-size: clamp(42px, 14vw, 70px);
+      line-height: .82;
+      letter-spacing: -3px;
+      font-weight: 1000;
+      text-transform: uppercase;
+      text-shadow: 0 0 22px rgba(255,255,255,.28), 0 18px 42px rgba(0,0,0,.9);
+    }
+
+    .subtitle {
+      margin-top: 14px;
+      color: rgba(255,255,255,.58);
+      font-size: 12px;
+      line-height: 1.45;
+      font-weight: 850;
+      letter-spacing: 1.6px;
+      text-transform: uppercase;
+      max-width: 330px;
+    }
+
+    .vault {
+      position: relative;
+      padding: 15px;
+      border-radius: 38px;
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.14), rgba(255,255,255,.035)),
+        rgba(0,0,0,.64);
+      border: 1px solid rgba(255,255,255,.18);
+      backdrop-filter: blur(22px);
+      box-shadow: 0 30px 90px rgba(0,0,0,.88), inset 0 1px 0 rgba(255,255,255,.20);
+      overflow: hidden;
+    }
+
+    .vault::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      background: linear-gradient(115deg, transparent, rgba(255,255,255,.22), transparent 43%);
+      animation: shine 5s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes shine {
+      0%, 35% { transform: translateX(-110%); }
+      65%, 100% { transform: translateX(110%); }
+    }
+
+    .section-head {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .section-head small {
+      display: block;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.5);
+      font-weight: 900;
+    }
+
+    .section-head strong {
+      display: block;
+      margin-top: 5px;
+      font-size: 24px;
+      font-weight: 1000;
+      letter-spacing: -1px;
+    }
+
+    .star {
+      width: 44px;
+      height: 44px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.08);
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255,255,255,.12);
+      font-size: 18px;
+    }
+
+    .gallery {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 16px;
+    }
+
+    .review-card {
+      position: relative;
+      border-radius: 28px;
+      overflow: hidden;
+      cursor: pointer;
+      background:
+        radial-gradient(circle at top right, rgba(255,255,255,.18), transparent 34%),
+        linear-gradient(155deg, rgba(255,255,255,.12), rgba(255,255,255,.035));
+      border: 1px solid rgba(255,255,255,.16);
+      box-shadow: inset 0 0 28px rgba(255,255,255,.035), 0 18px 42px rgba(0,0,0,.58);
+      transition: transform .2s ease;
+    }
+
+    .review-card:active {
+      transform: scale(.975);
+    }
+
+    .review-card img {
+      width: 100%;
+      display: block;
+      object-fit: contain;
+      background: #000;
+    }
+
+    .empty {
+      padding: 28px 18px;
+      text-align: center;
+      color: rgba(255,255,255,.62);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .bottom-back {
+      margin-top: 18px;
+      width: 100%;
+      min-height: 62px;
+      border: 0;
+      border-radius: 24px;
+      color: #fff;
+      cursor: pointer;
+      background:
+        radial-gradient(circle at top right, rgba(255,255,255,.21), transparent 34%),
+        linear-gradient(155deg, rgba(255,255,255,.12), rgba(255,255,255,.035));
+      border: 1px solid rgba(255,255,255,.15);
+      box-shadow: inset 0 0 28px rgba(255,255,255,.035), 0 14px 32px rgba(0,0,0,.48);
+      font-size: 13px;
+      font-weight: 1000;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+    }
+
+    .viewer {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: rgba(0,0,0,.88);
+      backdrop-filter: blur(16px);
+    }
+
+    .viewer.show {
+      display: flex;
+    }
+
+    .viewer img {
+      max-width: 96%;
+      max-height: 88%;
+      border-radius: 28px;
+      border: 1px solid rgba(255,255,255,.22);
+      box-shadow: 0 30px 90px rgba(0,0,0,.95), 0 0 42px rgba(255,255,255,.16);
+      background: #000;
+    }
+
+    .close-hint {
+      position: fixed;
+      bottom: calc(22px + env(safe-area-inset-bottom));
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,.55);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 390px) {
+      .app {
+        padding-left: 13px;
+        padding-right: 13px;
+      }
+
+      h1 {
+        font-size: 46px;
+      }
+
+      .vault {
+        border-radius: 32px;
+      }
+
+      .review-card {
+        border-radius: 24px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg"></div>
+  <div class="grid-bg"></div>
+  <div class="glow one"></div>
+  <div class="glow two"></div>
+
+  <main class="app">
+    <header class="topbar">
+      <div class="brand-chip">
+        <img src="logopricipale.jpg" alt="Logo" />
+        <span>Private Reviews</span>
+      </div>
+
+      <a class="back-home" href="index.html">←</a>
+    </header>
+
+    <section class="hero">
+      <div class="kicker">User Feedback</div>
+      <h1>RECENSIONI<br>CLIENTI</h1>
+      <div class="subtitle">
+        Feedback reali dalla community ufficiale.
+      </div>
+    </section>
+
+    <section class="vault">
+      <div class="section-head">
+        <div>
+          <small>Verified Area</small>
+          <strong>Gallery</strong>
+        </div>
+        <div class="star">★</div>
+      </div>
+
+      <div class="gallery" id="gallery">
+        <div class="empty">Caricamento recensioni...</div>
+      </div>
+
+      <button class="bottom-back" onclick="goHome()">
+        ← Torna alla home
+      </button>
+    </section>
+  </main>
+
+  <div class="viewer" id="viewer" onclick="closeViewer()">
+    <img id="viewer-img" alt="Recensione" />
+    <div class="close-hint">Tocca per chiudere</div>
+  </div>
+
+  <script>
+    const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+
+    if (tg) {
+      tg.ready();
+      tg.expand();
+      if (tg.setHeaderColor) tg.setHeaderColor("#000000");
+      if (tg.setBackgroundColor) tg.setBackgroundColor("#000000");
+    }
+
+    const gallery = document.getElementById("gallery");
+    const viewer = document.getElementById("viewer");
+    const viewerImg = document.getElementById("viewer-img");
+
+    function haptic(type) {
+      if (!tg || !tg.HapticFeedback) return;
+      if (type === "impact") tg.HapticFeedback.impactOccurred("medium");
+      if (type === "success") tg.HapticFeedback.notificationOccurred("success");
+    }
+
+    function goHome() {
+      haptic("impact");
+      window.location.href = "index.html";
+    }
+
+    fetch("recensioni.json")
+      .then(res => res.json())
+      .then(data => {
+        gallery.innerHTML = "";
+
+        if (!data || data.length === 0) {
+          gallery.innerHTML = '<div class="empty">Nessuna recensione disponibile</div>';
+          return;
+        }
+
+        data.forEach(item => {
+          const card = document.createElement("div");
+          card.className = "review-card";
+
+          const img = document.createElement("img");
+          img.src = item.img;
+          img.alt = "Recensione cliente";
+          img.loading = "lazy";
+
+          card.appendChild(img);
+
+          card.onclick = () => {
+            haptic("success");
+            openViewer(item.img);
+          };
+
+          gallery.appendChild(card);
+        });
+      })
+      .catch(() => {
+        gallery.innerHTML = '<div class="empty">Errore nel caricamento delle recensioni</div>';
+      });
+
+    function openViewer(src) {
+      viewerImg.src = src;
+      viewer.classList.add("show");
+    }
+
+    function closeViewer() {
+      viewer.classList.remove("show");
+      viewerImg.src = "";
+    }
+
+    document.addEventListener("keydown", function(event) {
+      if (event.key === "Escape") closeViewer();
+    });
+  </script>
+</body>
+</html>
