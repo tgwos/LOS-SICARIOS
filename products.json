@@ -71,6 +71,30 @@
       { "quantity": 200, "price": 4450 },
       { "quantity": 500, "price": 9500 }
     ]
+  },
+  
+{
+    "id": 3,
+    "name": "DRY MFL🔝",
+    "category": "stock1",
+    "previewImage": "https://imagedelivery.net/NDmb7wdAt1NpzNsXB7Yxlw/70210f8e-5af3-43d8-90a8-03261d1df500/public",
+    "media": [
+      {
+        "type": "video",
+        "src": "https://videodelivery.net/072ddad3ab220d3b72b3b545ada7e9fc/manifest/video.m3u8"
+      }
+    ],
+   
+    "prices": [
+      { "quantity": 5, "price": 40  },
+      { "quantity": 10, "price": 70 },
+      { "quantity": 25, "price": 120 },
+      { "quantity": 50, "price": 200 },
+      { "quantity": 100, "price": 350 },
+      { "quantity": 200, "price": 670 },
+      { "quantity": 500, "price": 1400 },
+      { "quantity": 1000, "price": 2650 }
+    ]
   }
   
 ]
